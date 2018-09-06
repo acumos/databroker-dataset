@@ -1,0 +1,66 @@
+#v1
+spark_deploy_mode=
+spark_driver_memory=
+spark_executor_memory=
+
+mysql_driver_name=
+
+#jdbc drivers
+jdbc_mysql_driver_name=
+jdbc_oracle_driver_name=
+
+#following DB's are not supported
+jdbc_db2_driver_name=
+jdbc_sybase_driver_name=
+
+spark_test_jar_http=
+spark_app_arguments=
+spark_main_class_name=
+spark_app_name=
+
+datasrc_mongo_username=
+datasrc_mongo_password=
+datasrc_mongo_dbname=
+datasrc_mongo_hostname=
+datasrc_mongo_port=
+datasrc_mongo_collection_name=
+datasrc_mongo_codecloud_collection_name=
+
+kerberos_user_config_dir=
+
+codecloud_base_url=
+codecloud_project_key=
+codecloud_repo=
+
+filepath_string=
+
+#please update this according to the env
+ingress_base_url=
+
+ingress_service_path=
+
+#location for the kerberos uploaded files by the user
+kerberos_user_config_dir=
+
+# Data Source delete Type
+dataSource_delete_type=
+
+hive_jdbc_transportMode=
+hive_jdbc_httpPath=
+writeBackDataSizeLimit=
+
+#if DataSource category is Database or JDBC connection, display first 5 rows
+#If DataSource category is folder, display first 5 lines of folder contents
+datasource_sample_size=
+
+# For DataSource category Casandara, Hive, JDBC and MYSQL
+# Calculate Data Size by sampling 20% of the total records
+# Only Do the sampling if the total records are 
+# greater than minimum_sampling_size
+minimum_sampling_size=
+
+kerberos_sample_config_file=
+kerberos_sample_keytab_file=
+
+proxy_host=
+proxy_port=
