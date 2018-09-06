@@ -1,0 +1,11 @@
+/logs/
+derby.log
+.classpath
+.project
+/.settings/
+/bin/
+/target/
+config.properties
+m09286.kerberos.keytab
+m09286.krb5.conf
+/kerberos/
