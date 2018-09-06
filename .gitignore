@@ -1,0 +1,9 @@
+/logs/
+derby.log
+.classpath
+.project
+/.settings/
+/bin/
+/target/
+application.properties
+config.properties
