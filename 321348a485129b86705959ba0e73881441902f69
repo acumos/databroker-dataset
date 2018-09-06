@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "19d82fee_b11c26f7",
+        "filename": ".gitreview",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-06T15:55:22Z",
+      "side": 1,
+      "message": "Remove empty lines",
+      "revId": "321348a485129b86705959ba0e73881441902f69",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ae24de8_c09e0349",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-06T15:55:22Z",
+      "side": 1,
+      "message": "Are these true for your code too? May be copied from other repo.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 48
+      },
+      "revId": "321348a485129b86705959ba0e73881441902f69",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6f5b13cc_f061d304",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-06T15:55:22Z",
+      "side": 1,
+      "message": "As you do not have anything. Please remove them. You can add these sections in the RST file documentation. More details on RST docs - https://docs.acumos.org/en/latest/docs-contributor-guide/index.html",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 18
+      },
+      "revId": "321348a485129b86705959ba0e73881441902f69",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
