@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4c0c3cbe_91c65c2a",
+        "filename": "dataset-service/src/main/java/org/acumos/service/controller/DatasetController.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T19:14:02Z",
+      "side": 1,
+      "message": "no license on this file.",
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "993bd98f_4da3ad3f",
+        "filename": "dataset-service/src/main/java/org/acumos/service/controller/DatasetController.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T19:14:02Z",
+      "side": 1,
+      "message": "better to create constants.",
+      "range": {
+        "startLine": 39,
+        "startChar": 38,
+        "endLine": 39,
+        "endChar": 104
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8633ee7_ab603bd5",
+        "filename": "datasource-service/src/main/java/org/acumos/service/controller/DatasourceController.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T19:14:02Z",
+      "side": 1,
+      "message": "I believe at least messages be constants, so that in case of any change, we just change the constant to reflect at all the places the message is used rather than to change at every line.",
+      "range": {
+        "startLine": 70,
+        "startChar": 28,
+        "endLine": 70,
+        "endChar": 35
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ac9a564_82363190",
+        "filename": "datasource-service/src/main/java/org/acumos/service/model/MongoDbConnectionModel.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T19:14:02Z",
+      "side": 1,
+      "message": "Any decision on MangoDb? do we need this file, if we do not choose to use MangoDb? \nUntil the decision is made, if we remove this file, will it impact any code?\nIf not, can we please remove, until the decision is made?",
+      "range": {
+        "startLine": 25,
+        "startChar": 13,
+        "endLine": 25,
+        "endChar": 35
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
