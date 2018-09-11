@@ -1,0 +1,205 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "67fe157c_ddb544ed",
+        "filename": "dataset-service/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T15:29:06Z",
+      "side": 1,
+      "message": "please change this package to org.acumos.databroker.dataset",
+      "range": {
+        "startLine": 15,
+        "startChar": 10,
+        "endLine": 15,
+        "endChar": 39
+      },
+      "revId": "3476daab2a4ad947a0edd59a0c3359b7c6ac9586",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fac1dc26_bf073d60",
+        "filename": "dataset-service/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T15:29:06Z",
+      "side": 1,
+      "message": "Can we please remove the commented code in any file, if it is not used?",
+      "range": {
+        "startLine": 268,
+        "startChar": 0,
+        "endLine": 279,
+        "endChar": 24
+      },
+      "revId": "3476daab2a4ad947a0edd59a0c3359b7c6ac9586",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d93b187d_ad4f5d97",
+        "filename": "dataset-service/src/main/java/org/acumos/service/controller/DatasetController.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T15:29:06Z",
+      "side": 1,
+      "message": "Please see, if it is fair to create Constants for all codes and messages.",
+      "range": {
+        "startLine": 39,
+        "startChar": 38,
+        "endLine": 39,
+        "endChar": 104
+      },
+      "revId": "3476daab2a4ad947a0edd59a0c3359b7c6ac9586",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "41d656a4_8bfe3366",
+        "filename": "dataset-service/src/main/java/org/acumos/service/schema/AdminMetaDataModel.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T15:29:06Z",
+      "side": 1,
+      "message": "change to 2018 on all files",
+      "range": {
+        "startLine": 5,
+        "startChar": 17,
+        "endLine": 5,
+        "endChar": 21
+      },
+      "revId": "3476daab2a4ad947a0edd59a0c3359b7c6ac9586",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "912e7856_77941943",
+        "filename": "dataset-service/src/main/java/org/acumos/service/schema/DataSetSearchKeys.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T15:29:06Z",
+      "side": 1,
+      "message": "Please remove the file. However, if you need it, please keep it clean without commented code.",
+      "revId": "3476daab2a4ad947a0edd59a0c3359b7c6ac9586",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e1cf685e_9ea1cb82",
+        "filename": "dataset-service/src/main/java/org/acumos/service/schema/DatasetModel_Get.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T15:29:06Z",
+      "side": 1,
+      "message": "Is there any reason to have underscore? If not can we please follow Java naming standards in all three classes which have underscores.",
+      "range": {
+        "startLine": 25,
+        "startChar": 38,
+        "endLine": 25,
+        "endChar": 54
+      },
+      "revId": "3476daab2a4ad947a0edd59a0c3359b7c6ac9586",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e5e5fb6_0c1f37e4",
+        "filename": "dataset-service/src/main/resources/logback.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T15:29:06Z",
+      "side": 1,
+      "message": "files that needs be created and sampled at wiki - https://wiki.acumos.org/display/OAM/Logging. Please review and try to follow the recommendations.",
+      "range": {
+        "startLine": 27,
+        "startChar": 1,
+        "endLine": 27,
+        "endChar": 69
+      },
+      "revId": "3476daab2a4ad947a0edd59a0c3359b7c6ac9586",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b777b85c_603c34ce",
+        "filename": "datasource-service/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T15:29:06Z",
+      "side": 1,
+      "message": "change to org.acumos.databroker.dataset",
+      "range": {
+        "startLine": 24,
+        "startChar": 10,
+        "endLine": 24,
+        "endChar": 39
+      },
+      "revId": "3476daab2a4ad947a0edd59a0c3359b7c6ac9586",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a41406f_6410a83c",
+        "filename": "pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-09-11T15:29:06Z",
+      "side": 1,
+      "message": "change to org.acumos.databroker.dataset",
+      "range": {
+        "startLine": 24,
+        "startChar": 10,
+        "endLine": 24,
+        "endChar": 39
+      },
+      "revId": "3476daab2a4ad947a0edd59a0c3359b7c6ac9586",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
