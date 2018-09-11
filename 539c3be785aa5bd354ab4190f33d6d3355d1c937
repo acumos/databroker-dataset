@@ -2,6 +2,98 @@
   "comments": [
     {
       "key": {
+        "uuid": "78ab9fd4_627502ff",
+        "filename": "dataset-service/README.md",
+        "patchSetId": 18
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-11T19:39:09Z",
+      "side": 1,
+      "message": "Really?  :)",
+      "range": {
+        "startLine": 5,
+        "startChar": 38,
+        "endLine": 5,
+        "endChar": 48
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4348082d_8ea935ba",
+        "filename": "dataset-service/application.properties",
+        "patchSetId": 18
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-11T19:39:09Z",
+      "side": 1,
+      "message": "Please remove",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 30
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4cfc9f38_1941ab96",
+        "filename": "dataset-service/application.properties.template",
+        "patchSetId": 18
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-11T19:39:09Z",
+      "side": 1,
+      "message": "Please remove",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 30
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4cc2dd20_09fb1b94",
+        "filename": "dataset-service/pom.xml",
+        "patchSetId": 18
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-11T19:39:09Z",
+      "side": 1,
+      "message": "Suggest using 1.5.15",
+      "range": {
+        "startLine": 24,
+        "startChar": 11,
+        "endLine": 24,
+        "endChar": 18
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4c0c3cbe_91c65c2a",
         "filename": "dataset-service/src/main/java/org/acumos/service/controller/DatasetController.java",
         "patchSetId": 18
@@ -13,6 +105,29 @@
       "writtenOn": "2018-09-11T19:14:02Z",
       "side": 1,
       "message": "no license on this file.",
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "438c3138_103b94d7",
+        "filename": "dataset-service/src/main/java/org/acumos/service/controller/DatasetController.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-11T19:39:09Z",
+      "side": 1,
+      "message": "Response class should ideally be your POJO, a model for your data.  Then swagger can provide useful information.",
+      "range": {
+        "startLine": 38,
+        "startChar": 182,
+        "endLine": 38,
+        "endChar": 188
+      },
       "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
@@ -35,6 +150,75 @@
         "startChar": 38,
         "endLine": 39,
         "endChar": 104
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45551638_100144a9",
+        "filename": "dataset-service/src/main/java/org/acumos/service/controller/DatasetController.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-11T19:39:09Z",
+      "side": 1,
+      "message": "list of string is kind of silly, might as well just use String, right?",
+      "range": {
+        "startLine": 45,
+        "startChar": 8,
+        "endLine": 45,
+        "endChar": 19
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc8d2e48_922025d6",
+        "filename": "dataset-service/src/main/resources/logback.xml",
+        "patchSetId": 18
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-11T19:39:09Z",
+      "side": 1,
+      "message": "The Acumos project is trying to adopt a logging standard and this pattern does not reflect the latest recommendation, please update",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 268
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e4a197d9_9b2bc239",
+        "filename": "datasource-service/pom.xml",
+        "patchSetId": 18
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-11T19:39:09Z",
+      "side": 1,
+      "message": "Please use 1.5.15",
+      "range": {
+        "startLine": 24,
+        "startChar": 11,
+        "endLine": 24,
+        "endChar": 18
       },
       "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
@@ -81,6 +265,69 @@
         "startChar": 13,
         "endLine": 25,
         "endChar": 35
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b29ed12_7a33c370",
+        "filename": "datasource-service/src/main/resources/application.properties",
+        "patchSetId": 18
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-11T19:39:09Z",
+      "side": 1,
+      "message": "Please remove",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 23
+      },
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "03ff09f8_fb9c5aaa",
+        "filename": "datasource-service/src/main/resources/logback.xml",
+        "patchSetId": 18
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-11T19:39:09Z",
+      "side": 1,
+      "message": "This does not reflect the latest logging standard recommendation, unfortunately",
+      "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2fa56982_c1429583",
+        "filename": "pom.xml",
+        "patchSetId": 18
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-11T19:39:09Z",
+      "side": 1,
+      "message": "Please change the groupId, this is not in the common-dataservice repository.",
+      "range": {
+        "startLine": 24,
+        "startChar": 10,
+        "endLine": 24,
+        "endChar": 39
       },
       "revId": "539c3be785aa5bd354ab4190f33d6d3355d1c937",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
