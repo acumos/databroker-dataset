@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "6669b218_8447d7c9",
+        "filename": "README.md",
+        "patchSetId": 31
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 225
+      },
+      "writtenOn": "2018-09-12T22:13:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4955f44b_95438468",
+      "range": {
+        "startLine": 3,
+        "startChar": 51,
+        "endLine": 3,
+        "endChar": 58
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a798f06c_2a14bd02",
         "filename": "dataset-service/pom.xml",
         "patchSetId": 31
@@ -140,6 +164,30 @@
     },
     {
       "key": {
+        "uuid": "0f72db4d_01cd07b6",
+        "filename": "dataset-service/src/main/java/org/acumos/config/WebConfig.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 225
+      },
+      "writtenOn": "2018-09-12T22:13:55Z",
+      "side": 1,
+      "message": "this is client driver for mongoDB\n\nactually mongoDB server will have to be downloaded by User and install on their server",
+      "parentUuid": "028b8b3d_847d17de",
+      "range": {
+        "startLine": 60,
+        "startChar": 2,
+        "endLine": 60,
+        "endChar": 13
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4113fbc1_8039c836",
         "filename": "dataset-service/src/main/java/org/acumos/service/common/CmlpApplicationEnum.java",
         "patchSetId": 31
@@ -151,6 +199,30 @@
       "writtenOn": "2018-09-12T21:13:31Z",
       "side": 1,
       "message": "common? what about databroker?",
+      "range": {
+        "startLine": 21,
+        "startChar": 27,
+        "endLine": 21,
+        "endChar": 33
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ca42f3f_2798cb17",
+        "filename": "dataset-service/src/main/java/org/acumos/service/common/CmlpApplicationEnum.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 225
+      },
+      "writtenOn": "2018-09-12T22:13:55Z",
+      "side": 1,
+      "message": "this is just a package name, i can change the package name if you want",
+      "parentUuid": "4113fbc1_8039c836",
       "range": {
         "startLine": 21,
         "startChar": 27,
@@ -180,6 +252,24 @@
     },
     {
       "key": {
+        "uuid": "0f34c571_b1101a96",
+        "filename": "dataset-service/src/main/java/org/acumos/service/controller/DatasetController.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 225
+      },
+      "writtenOn": "2018-09-12T22:13:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51b7134d_f18ffb22",
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "73b394d2_fdaf653f",
         "filename": "dataset-service/src/main/java/org/acumos/service/service/DataSetServiceImplV2.java",
         "patchSetId": 31
@@ -191,6 +281,30 @@
       "writtenOn": "2018-09-12T21:13:31Z",
       "side": 1,
       "message": "DESCRIPTOR ?",
+      "range": {
+        "startLine": 201,
+        "startChar": 29,
+        "endLine": 201,
+        "endChar": 38
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c520646_320d6e98",
+        "filename": "dataset-service/src/main/java/org/acumos/service/service/DataSetServiceImplV2.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 225
+      },
+      "writtenOn": "2018-09-12T22:13:55Z",
+      "side": 1,
+      "message": "dont know, will have to check with real developer",
+      "parentUuid": "73b394d2_fdaf653f",
       "range": {
         "startLine": 201,
         "startChar": 29,
@@ -266,6 +380,30 @@
     },
     {
       "key": {
+        "uuid": "822fd010_e4b06a56",
+        "filename": "dataset-service/src/main/resources/application.properties",
+        "patchSetId": 31
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 225
+      },
+      "writtenOn": "2018-09-12T22:13:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "03118080_eeeb589f",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 30
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fddedc24_8b567688",
         "filename": "dataset-service/src/main/resources/application.properties",
         "patchSetId": 31
@@ -277,6 +415,30 @@
       "writtenOn": "2018-09-12T21:13:31Z",
       "side": 1,
       "message": "we must not commit passwords to Gerrit.",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 64
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64f73491_bbba12a2",
+        "filename": "dataset-service/src/main/resources/application.properties",
+        "patchSetId": 31
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 225
+      },
+      "writtenOn": "2018-09-12T22:13:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fddedc24_8b567688",
       "range": {
         "startLine": 47,
         "startChar": 0,
