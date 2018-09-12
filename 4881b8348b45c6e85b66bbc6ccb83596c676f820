@@ -1,0 +1,314 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4955f44b_95438468",
+        "filename": "README.md",
+        "patchSetId": 31
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "Databroker?  Dataset and Datasource??",
+      "range": {
+        "startLine": 3,
+        "startChar": 51,
+        "endLine": 3,
+        "endChar": 58
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a798f06c_2a14bd02",
+        "filename": "dataset-service/pom.xml",
+        "patchSetId": 31
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "Use 1.5.15",
+      "range": {
+        "startLine": 24,
+        "startChar": 15,
+        "endLine": 24,
+        "endChar": 17
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4096b3bf_b3fb0100",
+        "filename": "dataset-service/pom.xml",
+        "patchSetId": 31
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "why are you adding a dependency on CDS?",
+      "range": {
+        "startLine": 72,
+        "startChar": 3,
+        "endLine": 76,
+        "endChar": 14
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "468968b0_bd7359a2",
+        "filename": "dataset-service/src/main/java/org/acumos/config/SwaggerConfiguration.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 56,
+        "startChar": 46,
+        "endLine": 56,
+        "endChar": 48
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfc4fb87_59447e6d",
+        "filename": "dataset-service/src/main/java/org/acumos/config/SwaggerConfiguration.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "better to use \"noreply\"",
+      "range": {
+        "startLine": 60,
+        "startChar": 57,
+        "endLine": 60,
+        "endChar": 64
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "028b8b3d_847d17de",
+        "filename": "dataset-service/src/main/java/org/acumos/config/WebConfig.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "Did legal give written permission for MongoDB?",
+      "range": {
+        "startLine": 60,
+        "startChar": 2,
+        "endLine": 60,
+        "endChar": 13
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4113fbc1_8039c836",
+        "filename": "dataset-service/src/main/java/org/acumos/service/common/CmlpApplicationEnum.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "common? what about databroker?",
+      "range": {
+        "startLine": 21,
+        "startChar": 27,
+        "endLine": 21,
+        "endChar": 33
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "51b7134d_f18ffb22",
+        "filename": "dataset-service/src/main/java/org/acumos/service/controller/DatasetController.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "should be private",
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "73b394d2_fdaf653f",
+        "filename": "dataset-service/src/main/java/org/acumos/service/service/DataSetServiceImplV2.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "DESCRIPTOR ?",
+      "range": {
+        "startLine": 201,
+        "startChar": 29,
+        "endLine": 201,
+        "endChar": 38
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8f8a37f_e8b5aecf",
+        "filename": "dataset-service/src/main/java/org/acumos/service/service/DataSetServiceV2.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "An interface really should have javadoc explaining the contract.",
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff111a2_868b48a4",
+        "filename": "dataset-service/src/main/java/org/acumos/service/service/DatasetService.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "Please choose a better package name, suggest using databroker and/or dataset, not \"service.service\"",
+      "range": {
+        "startLine": 21,
+        "startChar": 19,
+        "endLine": 21,
+        "endChar": 26
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "03118080_eeeb589f",
+        "filename": "dataset-service/src/main/resources/application.properties",
+        "patchSetId": 31
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "pls remove",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 30
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fddedc24_8b567688",
+        "filename": "dataset-service/src/main/resources/application.properties",
+        "patchSetId": 31
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "we must not commit passwords to Gerrit.",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 64
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e9dda25_29f42102",
+        "filename": "datasource-service/pom.xml",
+        "patchSetId": 31
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-12T21:13:31Z",
+      "side": 1,
+      "message": "Use 1.5.15",
+      "range": {
+        "startLine": 24,
+        "startChar": 15,
+        "endLine": 24,
+        "endChar": 17
+      },
+      "revId": "4881b8348b45c6e85b66bbc6ccb83596c676f820",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
