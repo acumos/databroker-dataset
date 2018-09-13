@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1106463b_6d2001a4",
+        "filename": "datasource-service/pom.xml",
+        "patchSetId": 34
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-13T18:35:22Z",
+      "side": 1,
+      "message": "Fails to compile due to missing jars.  This version number appears to be invalid.  I checked maven central and found version 2.7.3 -- https://repo.maven.apache.org/maven2/org/apache/hadoop/hadoop-common/2.7.3/",
+      "range": {
+        "startLine": 50,
+        "startChar": 12,
+        "endLine": 50,
+        "endChar": 28
+      },
+      "revId": "a517cc2f62cd2a52e0a46cc5982ebc9f498737c5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
