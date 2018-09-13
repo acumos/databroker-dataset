@@ -22,6 +22,30 @@
       "revId": "a517cc2f62cd2a52e0a46cc5982ebc9f498737c5",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "af58cb9e_43cc567c",
+        "filename": "datasource-service/pom.xml",
+        "patchSetId": 34
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 225
+      },
+      "writtenOn": "2018-09-13T19:20:27Z",
+      "side": 1,
+      "message": "i see the same in mvncentral\nhttps://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common/2.7.3.2.5.3.0-37",
+      "parentUuid": "1106463b_6d2001a4",
+      "range": {
+        "startLine": 50,
+        "startChar": 12,
+        "endLine": 50,
+        "endChar": 28
+      },
+      "revId": "a517cc2f62cd2a52e0a46cc5982ebc9f498737c5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
