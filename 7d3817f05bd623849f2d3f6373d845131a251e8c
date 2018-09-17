@@ -1,0 +1,669 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "58aaec2c_c5575d84",
+        "filename": "README.md",
+        "patchSetId": 37
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "and Datasource service*s*",
+      "range": {
+        "startLine": 3,
+        "startChar": 51,
+        "endLine": 3,
+        "endChar": 58
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "52dffc87_1dd2c34c",
+        "filename": "dataset-service/pom.xml",
+        "patchSetId": 37
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Does this reflect an existing version number in your existing project, or are you restarting the numbering (semantic versioning)?  If you copied the Spring-Boot version, maybe that isn\u0027t the best approach.  Just 1.0.0-SNAPSHOT might be preferable.",
+      "range": {
+        "startLine": 18,
+        "startChar": 10,
+        "endLine": 18,
+        "endChar": 16
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a966f1d7_99ff89fb",
+        "filename": "dataset-service/src/main/java/org/acumos/config/CustomBasicAuthenticationEntryPoint.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Suggest using a more specific package name to avoid confusion",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 26
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c1db9323_9604b1b4",
+        "filename": "dataset-service/src/main/java/org/acumos/config/SwaggerConfiguration.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "This is the (mildly) deprecated version of the constructor, suggest upgrading.",
+      "range": {
+        "startLine": 56,
+        "startChar": 24,
+        "endLine": 56,
+        "endChar": 31
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bb75777b_51e2a652",
+        "filename": "dataset-service/src/main/resources/application.properties",
+        "patchSetId": 37
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "I suggest following this (best?) practice: commit an application.properties.template file and add the file name \"application.properties\" to your .gitignore file.  Every developer then keeps a file with real passwords. This setup documents the necessary config but prevents accidental commit with the real file \u0026 real passwords (which happens incredibly often).",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 18
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14a3aa68_8be7a2fa",
+        "filename": "datasource-service/pom.xml",
+        "patchSetId": 37
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Identical to dataset..  same question as there: is this  an existing version number in your existing project, or are you restarting the numbering (semantic versioning)?  If you copied the Spring-Boot version, maybe that isn\u0027t the best approach.  Just 1.0.0-SNAPSHOT might be preferable.",
+      "range": {
+        "startLine": 18,
+        "startChar": 10,
+        "endLine": 18,
+        "endChar": 25
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c3b4bb1_c89af181",
+        "filename": "datasource-service/pom.xml",
+        "patchSetId": 37
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "I have seen problems because Mysql client/connector library is GPL. Some projects have switched to MariaDB client library for this reason.",
+      "range": {
+        "startLine": 92,
+        "startChar": 3,
+        "endLine": 96,
+        "endChar": 15
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "61b9b210_54e1774b",
+        "filename": "datasource-service/pom.xml",
+        "patchSetId": 37
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "suggest upgrading to 2.7.0",
+      "range": {
+        "startLine": 225,
+        "startChar": 12,
+        "endLine": 225,
+        "endChar": 17
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bb99cc1b_13a23175",
+        "filename": "datasource-service/src/main/java/org/acumos/DatasourceApplication.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Suggest using a more specific package name to avoid confusion",
+      "range": {
+        "startLine": 21,
+        "startChar": 8,
+        "endLine": 21,
+        "endChar": 18
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a278630_73a1e05a",
+        "filename": "datasource-service/src/main/java/org/acumos/config/SwaggerConfiguration.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Suggest adjusting to avoid this deprecated constructor",
+      "range": {
+        "startLine": 56,
+        "startChar": 24,
+        "endLine": 56,
+        "endChar": 31
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cc66339d_a6bd3ec8",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/common/CMLPCipherSuite.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Please strip out test code with AT\u0026T-specific identifiers",
+      "range": {
+        "startLine": 91,
+        "startChar": 33,
+        "endLine": 91,
+        "endChar": 52
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1becb06b_7b298291",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/common/CmlpApplicationEnum.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "If this is common across dataSET and dataSOURCE, can it be factored out to a library and reused in both? We don\u0027t have enough resources to maintain the code we have now, duplicating code is a poor choice",
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "43de53c4_3e59c081",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/common/Utilities.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Please use more specific name",
+      "range": {
+        "startLine": 77,
+        "startChar": 13,
+        "endLine": 77,
+        "endChar": 22
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "024772f4_8e74229d",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/controller/DatasourceFileController.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Wow that\u0027s a long variable name",
+      "range": {
+        "startLine": 68,
+        "startChar": 29,
+        "endLine": 68,
+        "endChar": 90
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "270c5116_de08ae96",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/FileDataSourceSvcImpl.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Please strip all *.att.com host names, this is useless for the public :)",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 72
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "43ff9546_6dca74a8",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/HdpDataSourceSvcImpl.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Use logger; printStackTrace is lost entirely",
+      "range": {
+        "startLine": 231,
+        "startChar": 0,
+        "endLine": 231,
+        "endChar": 23
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5d2f069c_3c60498a",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/HdpDataSourceSvcImpl.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 650,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Please strip all occurrences of at\u0026t host names",
+      "range": {
+        "startLine": 650,
+        "startChar": 0,
+        "endLine": 650,
+        "endChar": 64
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0d8349bc_d8155887",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/HdpDataSourceSvcImpl.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 662,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Strings like \"m09286@PROD.HADOOP.CMLP.ATT.COM\" must not be committed to Gerrit",
+      "range": {
+        "startLine": 662,
+        "startChar": 0,
+        "endLine": 662,
+        "endChar": 97
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7ef1def_01360ef8",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/SparkStandaloneSvc.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Lic hdr pls",
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ae39d8ca_d51c71a6",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/SparkStandaloneSvc.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Pls add javadoc in the interfaces",
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8c199890_e7849e0f",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/SparkStandaloneSvcImpl.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Lic hdr pls",
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ee78cbd_57b0985a",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/SparkYarnSvc.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Lic hdr pls",
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "80377c34_8b2ac6df",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/SparkYarnSvcImpl.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "License header pls",
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cf6c898_941198c9",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/utils/GlobalKeys.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Please add license header (I know, a hassle)",
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fdb0f6b_b0b07cbc",
+        "filename": "datasource-service/src/main/resources/application.properties",
+        "patchSetId": 37
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Same comment as in dataset:\n\nI suggest following this (best?) practice: commit an application.properties.template file and add the file name \"application.properties\" to your .gitignore file.  Every developer then keeps a file with real passwords. This setup documents the necessary config but prevents accidental commit with the real file \u0026 real passwords (which happens incredibly often).",
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bccdb656_e466e8f4",
+        "filename": "datasource-service/src/test/java/org/acumos/test/controller/DatasourceControllerTest.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "I recommend you use a more specific package name",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 35
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0d9ac17_13bb102d",
+        "filename": "datasource-service/src/test/java/org/acumos/test/controller/DatasourceControllerTest.java",
+        "patchSetId": 37
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "assert null is an empty test bcos the implementation is empty?",
+      "range": {
+        "startLine": 67,
+        "startChar": 20,
+        "endLine": 67,
+        "endChar": 24
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1dc55fd5_4fb03558",
+        "filename": "docs/index.rst",
+        "patchSetId": 37
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Please include both the data SET and the data SOURCE services in the documentation: overview, release notes, etc.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 15
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "393c6792_5ed3ce22",
+        "filename": "pom.xml",
+        "patchSetId": 37
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Maybe just databroker, since dataset is a child?",
+      "range": {
+        "startLine": 24,
+        "startChar": 32,
+        "endLine": 24,
+        "endChar": 39
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "efba64d8_64abae03",
+        "filename": "pom.xml",
+        "patchSetId": 37
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "maybe databroker parent?",
+      "range": {
+        "startLine": 25,
+        "startChar": 13,
+        "endLine": 25,
+        "endChar": 20
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9b3417c5_5a3438b8",
+        "filename": "pom.xml",
+        "patchSetId": 37
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-17T12:51:26Z",
+      "side": 1,
+      "message": "Maybe Databroker ?",
+      "range": {
+        "startLine": 28,
+        "startChar": 14,
+        "endLine": 28,
+        "endChar": 21
+      },
+      "revId": "7d3817f05bd623849f2d3f6373d845131a251e8c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
