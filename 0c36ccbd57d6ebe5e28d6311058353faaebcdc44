@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "78e35613_c2b56ca6",
+        "filename": "dataset-service/src/main/java/org/acumos/dataset/common/CmlpErrorList.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-18T19:43:08Z",
+      "side": 1,
+      "message": "Are you removing the Cmlp prefix everywhere?  Here too?",
+      "range": {
+        "startLine": 46,
+        "startChar": 13,
+        "endLine": 46,
+        "endChar": 17
+      },
+      "revId": "0c36ccbd57d6ebe5e28d6311058353faaebcdc44",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2176a590_5a609151",
+        "filename": "dataset-service/src/main/java/org/acumos/dataset/common/HelperTool.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-18T19:43:08Z",
+      "side": 1,
+      "message": "This occurs in many CMLP projects, could it be factored out?",
+      "range": {
+        "startLine": 43,
+        "startChar": 13,
+        "endLine": 43,
+        "endChar": 23
+      },
+      "revId": "0c36ccbd57d6ebe5e28d6311058353faaebcdc44",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "acd2f888_79f672bc",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/SparkYarnSvc.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-18T19:43:08Z",
+      "side": 1,
+      "message": "Thanks for javadoc, please add parameters, Javadoc validator will fail without",
+      "revId": "0c36ccbd57d6ebe5e28d6311058353faaebcdc44",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcf6ddbe_2c967e7e",
+        "filename": "datasource-service/src/main/resources/application.properties",
+        "patchSetId": 41
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-18T19:43:08Z",
+      "side": 1,
+      "message": "Now that you have added file application.properties.template, strongly recommend you remove this application.properties AND list it in the .gitignore file",
+      "revId": "0c36ccbd57d6ebe5e28d6311058353faaebcdc44",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d2d404a7_96e11efc",
+        "filename": "docs/database_install.rst",
+        "patchSetId": 41
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-18T19:43:08Z",
+      "side": 1,
+      "message": "Pls add title to this page",
+      "revId": "0c36ccbd57d6ebe5e28d6311058353faaebcdc44",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ea968834_6de482be",
+        "filename": "docs/index.rst",
+        "patchSetId": 41
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-18T19:43:08Z",
+      "side": 1,
+      "message": "pls fix line length",
+      "revId": "0c36ccbd57d6ebe5e28d6311058353faaebcdc44",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
