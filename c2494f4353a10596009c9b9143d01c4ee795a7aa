@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2474c27c_6df25b32",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/common/CMLPCipherSuite.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-19T13:44:25Z",
+      "side": 1,
+      "message": "Will you rename the prefix for this file also?",
+      "revId": "c2494f4353a10596009c9b9143d01c4ee795a7aa",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54c36f26_9ce5c5c6",
+        "filename": "datasource-service/src/main/resources/application.properties",
+        "patchSetId": 42
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-19T13:44:25Z",
+      "side": 1,
+      "message": "MUST remove this file, must not have valid username and password strings committed to Gerrit",
+      "range": {
+        "startLine": 42,
+        "startChar": 23,
+        "endLine": 42,
+        "endChar": 34
+      },
+      "revId": "c2494f4353a10596009c9b9143d01c4ee795a7aa",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
