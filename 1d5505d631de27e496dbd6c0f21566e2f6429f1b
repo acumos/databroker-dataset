@@ -1,0 +1,279 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ca0cb3c3_d4613112",
+        "filename": "dataset-service/pom.xml",
+        "patchSetId": 46
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Please use 1.5.16.RELEASE",
+      "range": {
+        "startLine": 24,
+        "startChar": 15,
+        "endLine": 24,
+        "endChar": 17
+      },
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89e20098_c0e261f8",
+        "filename": "dataset-service/src/main/java/org/acumos/dataset/schema/DataSetSearchKeys.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Please use logger, never printStackTrace",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 23
+      },
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8eba4df_b471bab5",
+        "filename": "dataset-service/src/main/java/org/acumos/dataset/utils/ApplicationUtilities.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "never a good policy to catch and discard, at least log",
+      "range": {
+        "startLine": 368,
+        "startChar": 0,
+        "endLine": 368,
+        "endChar": 15
+      },
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0745a1c5_f19b6089",
+        "filename": "dataset-service/src/main/resources/application.properties",
+        "patchSetId": 46
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Please remove this file, and list it in the .gitignore.  You have an app.props.templ that\u0027s enough. This way you avoid the error of committing real passwords, which invariably happens if you let Gerrit manage developer app.props files.",
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2cbbab95_3d04305f",
+        "filename": "datasource-service/pom.xml",
+        "patchSetId": 46
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Please use 1.5.16.RELEASE",
+      "range": {
+        "startLine": 24,
+        "startChar": 15,
+        "endLine": 24,
+        "endChar": 17
+      },
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b306957_accb92cf",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/HdpDataSourceSvcImpl.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Pls remove code, don\u0027t comment out huge blocks",
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4b3ee3e7_1f2fe818",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/HdpDataSourceSvcImpl.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Might be ignored, but best to log not use stack Trace to stdout",
+      "range": {
+        "startLine": 569,
+        "startChar": 0,
+        "endLine": 569,
+        "endChar": 23
+      },
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc81db26_a1626041",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/HiveDataSourceSvcImpl.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Maybe ignored, but use logger not stdout for stack traces",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 138,
+        "endChar": 24
+      },
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "064885ea_65fd1dfb",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/service/MongoDataSourceSvcImpl.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Please use logger, not printstacktrace",
+      "range": {
+        "startLine": 116,
+        "startChar": 0,
+        "endLine": 116,
+        "endChar": 40
+      },
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d2db3b5_6dcdbace",
+        "filename": "datasource-service/src/main/java/org/acumos/datasource/utils/ApplicationUtilities.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 715,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Please use logger, not stacktrace",
+      "range": {
+        "startLine": 715,
+        "startChar": 0,
+        "endLine": 715,
+        "endChar": 23
+      },
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5c5b556_53583b59",
+        "filename": "datasource-service/src/main/resources/application.properties",
+        "patchSetId": 46
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Oops, passwords.  Please remove this file, and list it in the .gitignore.  You have an app.props.templ that\u0027s enough. This error happens to everyone, all the time.  The only way to avoid is to stop committing the app.props file.",
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0f0297e_c2198aa8",
+        "filename": "docs/database_install.rst",
+        "patchSetId": 46
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Please add missing comment \"..\" at start of this line",
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6675b94c_74f9379b",
+        "filename": "docs/index.rst",
+        "patchSetId": 46
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-24T15:56:04Z",
+      "side": 1,
+      "message": "Please add the missing developer-guide.rst file (or if that\u0027s not coming, remove the line)",
+      "range": {
+        "startLine": 32,
+        "startChar": 3,
+        "endLine": 32,
+        "endChar": 18
+      },
+      "revId": "1d5505d631de27e496dbd6c0f21566e2f6429f1b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
