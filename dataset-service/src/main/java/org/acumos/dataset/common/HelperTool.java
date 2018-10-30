@@ -146,8 +146,7 @@ public class HelperTool {
 				String requestURI = request.getRequestURI().toString();
 
 				String baseURL = requestURL.substring(0, requestURL.indexOf(requestURI));
-				String ingressPath = HelperTool.getEnv("ingress_service_path",
-						HelperTool.getComponentPropertyValue("ingress_service_path"));
+				String ingressPath = HelperTool.getEnv("ingress_service_path", HelperTool.getComponentPropertyValue("ingress_service_path"));
 
 				StringBuilder sb = new StringBuilder();
 				sb.append(baseURL).append("/").append(ingressPath).append(requestURI);

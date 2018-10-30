@@ -69,9 +69,11 @@ public class DatasetController {
 			@ApiResponse(code = 500, message = GlobalKeys.INTERNAL_SERVER_ERROR) })
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Response getDataSetList(@RequestHeader String authorization, @RequestParam(GlobalKeys.TEXT_SEARCH) String textSearch, 
-								   @RequestParam(GlobalKeys.SEARCH_KEYS) DataSetSearchKeys datasetSearchKeys,
-								   @RequestParam(GlobalKeys.PAGE) int offset, @RequestParam(GlobalKeys.PER_PAGE) int limit) {
+	public Response getDataSetList(@RequestHeader String authorization, 
+								   @RequestParam(value=GlobalKeys.TEXT_SEARCH, required=false) String textSearch, 
+								   @RequestParam(value=GlobalKeys.SEARCH_KEYS, required=false) DataSetSearchKeys datasetSearchKeys,
+								   @RequestParam(value=GlobalKeys.PAGE, required=false, defaultValue = "1") int offset, 
+								   @RequestParam(value=GlobalKeys.PER_PAGE, required=false, defaultValue = "25") int limit) {
 		logger.debug("getDataSetList ", textSearch);
 		return service.getDataSetListV2(authorization, textSearch, datasetSearchKeys, offset, limit);
 	}

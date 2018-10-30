@@ -28,6 +28,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 /**
  * Spring 4 security requires a CSRF token on POST/PUT/DELETE requests. But this
  * server has no web pages where a CSRF token would be sent, so disable.
@@ -38,6 +40,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
  * http://ryanjbaxter.com/2015/01/06/securing-rest-apis-with-spring-boot/
  */
 @Configuration
+@EnableSwagger2
 @EnableWebSecurity
 public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
@@ -56,13 +59,16 @@ public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAda
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable() //
-				.authorizeRequests() //
-				.antMatchers("/healthcheck").permitAll() //
-				.antMatchers("/version").permitAll() //
-				.antMatchers("/**").authenticated() //
+		
+		http.csrf().disable()
+				.authorizeRequests()
+				.antMatchers("/healthcheck").permitAll()
+				.antMatchers("/version").permitAll()
+				.antMatchers("/v2/api-docs", "/swagger-resources/configuration/ui", "/swagger-resources", "/swagger-resources/configuration/security", "/swagger-ui.html", "/webjars/**").permitAll()
+				.antMatchers("/**").authenticated()
 				.and().httpBasic().realmName(REALM_NAME).authenticationEntryPoint(getBasicAuthEntryPoint());
 	}
+	
 
 	@Bean
 	public BasicAuthenticationEntryPoint getBasicAuthEntryPoint() {
