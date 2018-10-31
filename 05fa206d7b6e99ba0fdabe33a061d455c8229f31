@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb611153_00324125",
+        "filename": "dataset-service/src/main/java/org/acumos/dataset/common/HelperTool.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-10-31T16:01:50Z",
+      "side": 1,
+      "message": "hardcoding configuration keys is probably not the best choice of coding style",
+      "range": {
+        "startLine": 149,
+        "startChar": 44,
+        "endLine": 149,
+        "endChar": 64
+      },
+      "revId": "05fa206d7b6e99ba0fdabe33a061d455c8229f31",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
