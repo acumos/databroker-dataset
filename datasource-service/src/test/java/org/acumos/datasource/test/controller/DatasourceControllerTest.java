@@ -28,6 +28,7 @@ import java.lang.invoke.MethodHandles;
 
 import javax.ws.rs.core.Response;
 
+import org.acumos.datasource.common.JsonResponse;
 import org.acumos.datasource.controller.DatasourceController;
 import org.junit.Assert;
 import org.junit.Before;
@@ -65,21 +66,21 @@ public class DatasourceControllerTest {
 	@Test
 	public void getDataSourcesList() {
 		datasourceController = mock(DatasourceController.class);
-		Response list = datasourceController.getDataSourcesList(null, "namespace", "category", "textSearch", 0, 0);
+		ResponseEntity<JsonResponse> list = datasourceController.getDataSourcesList(null, "namespace", "category", "textSearch", 0, 0);
 		Assert.assertNull(list);
 	}
 	
 	@Test
 	public void getDataSource() {
 		datasourceController = mock(DatasourceController.class);
-		Response list = datasourceController.getDataSource(null, "datasourceKey");
+		ResponseEntity<JsonResponse> list = datasourceController.getDataSource(null, "datasourceKey");
 		Assert.assertNull(list);
 	}
 	
 	@Test
 	public void getDataSourceContents() {
 		datasourceController = mock(DatasourceController.class);
-		Response list = datasourceController.getDataSourceContents(null, "dataSourceKey", "hdfsFilename", "proxyHost", 0, "proxyUsername", "proxyPassword");
+		ResponseEntity<JsonResponse> list = datasourceController.getDataSourceContents(null, "dataSourceKey", "hdfsFilename", "proxyHost", 0, "proxyUsername", "proxyPassword");
 		Assert.assertNull(list);
 	}
 	
@@ -93,28 +94,28 @@ public class DatasourceControllerTest {
 	@Test
 	public void saveDataSourceDetail() throws Exception {
 		datasourceController = mock(DatasourceController.class);
-		Response list = datasourceController.saveDataSourceDetail(null, null, "proxyHost", 0, "proxyUsername", "proxyPassword");
+		ResponseEntity<JsonResponse> list = datasourceController.saveDataSourceDetail(null, null, "proxyHost", 0, "proxyUsername", "proxyPassword");
 		Assert.assertNull(list);
 	}
 	
 	@Test
 	public void updateDataSourceDetail(){
 		datasourceController = mock(DatasourceController.class);
-		Response list = datasourceController.updateDataSourceDetail(null, "dataSourcekey", null, "proxyHost", 0, "proxyUsername", "proxyPassword");
+		ResponseEntity<JsonResponse> list = datasourceController.updateDataSourceDetail(null, "dataSourcekey", null, "proxyHost", 0, "proxyUsername", "proxyPassword");
 		Assert.assertNull(list);
 	}
 	
 	@Test
 	public void deleteDataSourceDetail() {
 		datasourceController = mock(DatasourceController.class);
-		Response list = datasourceController.deleteDataSourceDetail(null, "dataSourcekey");
+		ResponseEntity<JsonResponse> list = datasourceController.deleteDataSourceDetail(null, "dataSourcekey");
 		Assert.assertNull(list);
 	}
 	
 	@Test
 	public void validateDataSourceConnection() {
 		datasourceController = mock(DatasourceController.class);
-		Response list = datasourceController.validateDataSourceConnection(null, "dataSourcekey");
+		ResponseEntity<JsonResponse> list = datasourceController.validateDataSourceConnection(null, "dataSourcekey");
 		Assert.assertNull(list);
 	}
 	
@@ -128,7 +129,7 @@ public class DatasourceControllerTest {
 	@Test
 	public void writebackPrediction() {
 		datasourceController = mock(DatasourceController.class);
-		Response list = datasourceController.writebackPrediction(null, "dataSourcekey", "hdfsFilename", "includesHeader", "data", "proxyHost", 0, "proxyUsername", "proxyPassword");
+		ResponseEntity<JsonResponse> list = datasourceController.writebackPrediction(null, "dataSourcekey", "hdfsFilename", "includesHeader", "data", "proxyHost", 0, "proxyUsername", "proxyPassword");
 		Assert.assertNull(list);
 	}
 	

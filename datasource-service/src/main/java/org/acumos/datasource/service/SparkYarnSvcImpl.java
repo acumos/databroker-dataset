@@ -23,6 +23,12 @@ package org.acumos.datasource.service;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.acumos.datasource.common.HelperTool;
+import org.acumos.datasource.exception.DataSrcException;
+import org.acumos.datasource.model.JobSubmissionYarn;
+import org.acumos.datasource.model.KerberosLogin;
+import org.acumos.datasource.model.SparkYarnTestModel;
+import org.acumos.datasource.utils.ApplicationUtilities;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
@@ -30,22 +36,22 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.deploy.SparkHadoopUtil;
 import org.apache.spark.deploy.yarn.Client;
 import org.apache.spark.deploy.yarn.ClientArguments;
-import org.springframework.stereotype.Service;
-
-import org.slf4j.LoggerFactory;
-import org.acumos.datasource.common.HelperTool;
-import org.acumos.datasource.exception.DataSrcException;
-import org.acumos.datasource.model.JobSubmissionYarn;
-import org.acumos.datasource.model.KerberosLogin;
-import org.acumos.datasource.model.SparkYarnTestModel;
-import org.acumos.datasource.utils.ApplicationUtilities;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class SparkYarnSvcImpl implements SparkYarnSvc {
 
 	private static Logger log = LoggerFactory.getLogger(SparkYarnSvcImpl.class);
 
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
+	
 	public SparkYarnSvcImpl() {
 
 	}
@@ -67,7 +73,7 @@ public class SparkYarnSvcImpl implements SparkYarnSvc {
 			}
 		}
 
-		Configuration config = HelperTool.getKerberisedConfiguration(objJobSubmissionYarn.getHadoopHostName(),
+		Configuration config = helperTool.getKerberisedConfiguration(objJobSubmissionYarn.getHadoopHostName(),
 				objJobSubmissionYarn.getKerberosLoginUser());
 		config.set("yarn.resourcemanager.address", objJobSubmissionYarn.getYarnRMAddress());
 		log.info("YARN RM address in hadoop configuration: " + config.get("yarn.resourcemanager.address"));
@@ -81,8 +87,8 @@ public class SparkYarnSvcImpl implements SparkYarnSvc {
 				.setAppName(objJobSubmissionYarn.getAppName())
 				.set("spark.submit.deployMode",
 						(objJobSubmissionYarn.getDeployMode() != null) ? objJobSubmissionYarn.getDeployMode()
-								: HelperTool.getEnv("spark_deploy_mode",
-										HelperTool.getComponentPropertyValue("spark_deploy_mode")))
+								: helperTool.getEnv("spark_deploy_mode",
+										helperTool.getComponentPropertyValue("spark_deploy_mode")))
 				.set("spark.authenticate", "true")
 				.set("spark.yarn.principal", objJobSubmissionYarn.getKerberosLoginUser())
 				.set("spark.yarn.keytab", System.getProperty("user.dir") + System.getProperty("file.separator")
@@ -91,12 +97,12 @@ public class SparkYarnSvcImpl implements SparkYarnSvc {
 						+ "." + "kerberos.keytab")
 				.set("spark.driver.memory",
 						(objJobSubmissionYarn.getDriverMemory() != null ? objJobSubmissionYarn.getDriverMemory()
-								: HelperTool.getEnv("spark_driver_memory",
-										HelperTool.getComponentPropertyValue("spark_driver_memory"))))
+								: helperTool.getEnv("spark_driver_memory",
+										helperTool.getComponentPropertyValue("spark_driver_memory"))))
 				.set("spark.executor.memory",
 						(objJobSubmissionYarn.getExecutorMemory() != null ? objJobSubmissionYarn.getExecutorMemory()
-								: HelperTool.getEnv("spark_executor_memory",
-										HelperTool.getComponentPropertyValue("spark_executor_memory"))));
+								: helperTool.getEnv("spark_executor_memory",
+										helperTool.getComponentPropertyValue("spark_executor_memory"))));
 
 		log.info("spark configuration details: spark yarn jar = " + sparkConf.get("spark.yarn.jars")
 				+ "/spark deploy mode = " + sparkConf.get("spark.submit.deployMode") + "/spark yarn principal = "
@@ -133,7 +139,7 @@ public class SparkYarnSvcImpl implements SparkYarnSvc {
 	@Override
 	public void createKerberosKeytab(KerberosLogin objKerberosLogin) throws IOException, DataSrcException {
 		log.info("Creating kerberos keytab for principal " + objKerberosLogin.getKerberosLoginUser());
-		ApplicationUtilities.createKerberosKeytab(objKerberosLogin);
+		applicationUtilities.createKerberosKeytab(objKerberosLogin);
 		log.info("Created kerberos keytab for principal " + objKerberosLogin.getKerberosLoginUser());
 
 	}
@@ -144,7 +150,7 @@ public class SparkYarnSvcImpl implements SparkYarnSvc {
 				+ objSparkYarnTestModel.getObjJobSubmissionYarn().getHadoopHostName() + " using principal "
 				+ objSparkYarnTestModel.getObjJobSubmissionYarn().getKerberosLoginUser()
 				+ "for hive connectivity testing.");
-		ApplicationUtilities.createKerberosKeytab(objSparkYarnTestModel.getObjKerberosLogin());
+		applicationUtilities.createKerberosKeytab(objSparkYarnTestModel.getObjKerberosLogin());
 		log.info("Testing hive connectivity for hostname "
 				+ objSparkYarnTestModel.getObjJobSubmissionYarn().getHadoopHostName() + " using principal "
 				+ objSparkYarnTestModel.getObjJobSubmissionYarn().getKerberosLoginUser()

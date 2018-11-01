@@ -24,6 +24,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -32,6 +33,7 @@ import org.acumos.datasource.common.DataSrcErrorList;
 import org.acumos.datasource.common.DataSrcRestError;
 import org.acumos.datasource.common.ErrorListEnum;
 import org.acumos.datasource.common.HelperTool;
+import org.acumos.datasource.common.JsonResponse;
 import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.schema.FileDetailsInfo;
 import org.acumos.datasource.service.DataSourceServiceV2Impl;
@@ -39,7 +41,10 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,6 +81,19 @@ public class DatasourceFileController {
 	@Autowired
 	private HttpServletRequest request;
 	
+	@Autowired
+	HelperTool helperTool;
+	
+	private HttpHeaders getHeaders(Response rsp) {
+		MultivaluedMap<String, Object> mHeader = rsp.getHeaders();
+		HttpHeaders headers = new HttpHeaders();
+		for(String key: mHeader.keySet()) {
+			headers.add(key, mHeader.get(key).toString().replace("[", "").replace("]", ""));
+		}
+		
+		return headers;
+	}
+	
 	@RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = LOG_UPLOADING_KERBEROS_CONFIG_FILES, notes = LOG_STATUS_OF_UPLOADING_FILES, response = FileDetailsInfo.class)
 	@ApiResponses(value = {
@@ -86,12 +104,12 @@ public class DatasourceFileController {
 			@ApiResponse(code = 404, message = NOT_FOUND),
 			@ApiResponse(code = 500, message = INTERNAL_SERVER_ERROR) })
 	@ResponseBody
-	public Response kerberosFileupload(@RequestHeader("Authorization") String authorization,
+	public ResponseEntity<JsonResponse> kerberosFileupload(@RequestHeader("Authorization") String authorization,
 			@RequestParam(CONFIGFILE) MultipartFile bodyPart1,
 			@RequestParam(KEYTABFILE) MultipartFile bodyPart2) {
 		
 		try {
-			String remoteUser = HelperTool.getRemoteUser(request);
+			String remoteUser = helperTool.getRemoteUser(request);
 			log.info("kerberosFileupload, remote user detail: " + remoteUser);
 			
 			if(bodyPart1 == null || bodyPart1 == null) {
@@ -118,19 +136,21 @@ public class DatasourceFileController {
 						json.put("kerberosKeyTabFileId", filename);
 				}
 
-				return Response.status(Status.CREATED.getStatusCode()).entity(json.toString()).build();
+				Response rsp =  Response.status(Status.CREATED.getStatusCode()).entity(json.toString()).build();
+				return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 
 			} else {
 				throw new Exception("Service returned invalid uploaded fileNames.");
 			}
 		} catch (DataSrcException cmlpException) {
-			return cmlpException.toResponse();
+			Response rsp =  cmlpException.toResponse();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 			
 		} catch (Exception e) {
 			log.info("kerberosFileupload, Unknown Exception : " + e.getMessage());
 			DataSrcRestError err = DataSrcErrorList.buildError(e, null, CmlpApplicationEnum.DATASOURCE);
-			
-			return Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			Response rsp =  Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 		}
 	}
 }

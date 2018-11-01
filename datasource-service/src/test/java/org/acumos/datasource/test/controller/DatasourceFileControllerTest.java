@@ -24,10 +24,9 @@ import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import java.lang.invoke.MethodHandles;
-import javax.ws.rs.core.Response;
 
+import org.acumos.datasource.common.JsonResponse;
 import org.acumos.datasource.controller.DatasourceFileController;
-import org.acumos.datasource.schema.FileDetailsInfo;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -63,7 +63,7 @@ public class DatasourceFileControllerTest {
 	@Test
 	public void kerberosFileupload() throws Exception {
 		datasourceFileController = mock(DatasourceFileController.class);
-		Response list = datasourceFileController.kerberosFileupload(null, null,null);
+		ResponseEntity<JsonResponse> list = datasourceFileController.kerberosFileupload(null, null,null);
 		Assert.assertNull(list);
 	}
 	

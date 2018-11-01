@@ -35,14 +35,8 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.apache.hadoop.conf.Configuration;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.LoggerFactory;
 import org.acumos.datasource.common.CmlpApplicationEnum;
 import org.acumos.datasource.common.DataSrcErrorList;
 import org.acumos.datasource.common.DataSrcRestError;
@@ -53,11 +47,16 @@ import org.acumos.datasource.connection.DbUtilitiesV2;
 import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.model.KerberosLogin;
 import org.acumos.datasource.schema.ColumnMetadataInfo;
-import org.acumos.datasource.schema.DataSourceModelGet;
 import org.acumos.datasource.schema.DataSourceMetadata;
+import org.acumos.datasource.schema.DataSourceModelGet;
 import org.acumos.datasource.schema.NameValue;
 import org.acumos.datasource.utils.ApplicationUtilities;
+import org.apache.hadoop.conf.Configuration;
+import org.json.JSONObject;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 
 @Service
@@ -70,6 +69,12 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 	@Autowired
 	private DbUtilitiesV2 dbUtilities;
 
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
+	
 	public HiveDataSourceSvcImpl() {
 	}
 
@@ -105,7 +110,7 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 	public void createKerberosKeytab(KerberosLogin objKerberosLogin) throws IOException, DataSrcException {
 		log.info("Creating kerberos keytab for principal " + objKerberosLogin.getKerberosLoginUser());
 
-		ApplicationUtilities.createKerberosKeytab(objKerberosLogin);
+		applicationUtilities.createKerberosKeytab(objKerberosLogin);
 
 		log.info("Created kerberos keytab for principal " + objKerberosLogin.getKerberosLoginUser());
 
@@ -127,12 +132,12 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 			log.info("Creating kerberos keytab for hostname " + hostName + " using principal "
 					+ objKerberosLogin.getKerberosLoginUser() + " for hdfs connectivity testing.");
 
-			ApplicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());	
+			applicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());	
 		} else {
 			try {
 				log.info("overwriting kerberos keytab for hostname " + hostName + " using principal "
 						+ objKerberosLogin.getKerberosLoginUser() + " for hdfs connectivity testing.");
-				ApplicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
+				applicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
 			} catch (Exception e) {
 				//ignore
 				e.printStackTrace();
@@ -154,15 +159,15 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 		log.info("Creating kerberised hadoop configuration for hostname " + hostName + " using principal "
 				+ kerberosLoginUser + " for hive connectivity testing.");
 
-		Configuration config = HelperTool.getKerberisedConfiguration(hostName,
+		Configuration config = helperTool.getKerberisedConfiguration(hostName,
 				kerberosLoginUser);
 
 		log.info("loading JDBC driver class for hive connectivity");
 		Class.forName("org.apache.hive.jdbc.HiveDriver");
 
 		//EE3488
-		String transportMode=HelperTool.getEnv("hive_jdbc_transportMode", HelperTool.getComponentPropertyValue("hive_jdbc_transportMode"));
-		String httpPath=HelperTool.getEnv("hive_jdbc_httpPath", HelperTool.getComponentPropertyValue("hive_jdbc_httpPath"));
+		String transportMode=helperTool.getEnv("hive_jdbc_transportMode", helperTool.getComponentPropertyValue("hive_jdbc_transportMode"));
+		String httpPath=helperTool.getEnv("hive_jdbc_httpPath", helperTool.getComponentPropertyValue("hive_jdbc_httpPath"));
 		String connectionUri =null;
 		log.info("getting JDBC hive connection using "
 				+ "- hostname passed from client as payload - " + hostName 
@@ -192,11 +197,11 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 
 		ArrayList<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false, authorization);
 
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		
 		if (dbDataSource.getCategory().equals("hive") && dbDataSource.getOwnedBy().equals(user)) {
 
-			Map<String, String> decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			Map<String, String> decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 			
 			StringBuilder resultString = null;
 			
@@ -206,8 +211,8 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 			}
 			
 			log.info("getResults(), restoring config files from codecloud...");
-			String kerberosConfigFileName = (ApplicationUtilities.getKerberosFileName(user, dbDataSource.getHdfsHiveDetails().getKerberosConfigFileId()) + ".krb5.conf");
-			String kerberosKeyTabFileName = (ApplicationUtilities.getKerberosFileName(user,  dbDataSource.getHdfsHiveDetails().getKerberosKeyTabFileId()) + ".keytab");
+			String kerberosConfigFileName = (applicationUtilities.getKerberosFileName(user, dbDataSource.getHdfsHiveDetails().getKerberosConfigFileId()) + ".krb5.conf");
+			String kerberosKeyTabFileName = (applicationUtilities.getKerberosFileName(user,  dbDataSource.getHdfsHiveDetails().getKerberosKeyTabFileId()) + ".keytab");
 
 			//restore user exported config and KeyTab files
 			restoreKerberosUserConfigFiles(kerberosConfigFileName, kerberosKeyTabFileName, decryptionMap);
@@ -218,7 +223,7 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 			//successfully Restored the files
 			log.info("getResults(), Kerberos files were restored successfully...Proceed with check connection");
 			
-			KerberosConfigInfo kerberosConfig = ApplicationUtilities.getKerberosConfigInfo(kerberosConfigFileName,
+			KerberosConfigInfo kerberosConfig = applicationUtilities.getKerberosConfigInfo(kerberosConfigFileName,
 					kerberosKeyTabFileName);
 			
 			con = getConnection(dbDataSource.getCommonDetails().getServerName(),
@@ -226,7 +231,7 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 					kerberosConfig.getKerberosRealms());
 			
 			//Remove semicolon
-			dbDataSource.getHdfsHiveDetails().setQuery(ApplicationUtilities.trimSemicolonAtEnd(dbDataSource.getHdfsHiveDetails().getQuery()));
+			dbDataSource.getHdfsHiveDetails().setQuery(applicationUtilities.trimSemicolonAtEnd(dbDataSource.getHdfsHiveDetails().getQuery()));
 			
 			//preparing statement and executing it
 			Statement statement = con.createStatement();
@@ -311,7 +316,7 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 			objJson.remove("_id");
 			
 			//Add the fields from code cloud
-			objJson.put("kerberosconfigfilecontents", ApplicationUtilities.htmlDecoding(decryptionMap.get("kerberosconfigfilecontents")));
+			objJson.put("kerberosconfigfilecontents", applicationUtilities.htmlDecoding(decryptionMap.get("kerberosconfigfilecontents")));
 			objJson.put("kerberoskeytabcontent", decryptionMap.get("kerberoskeytabcontent"));
 			objJson.put("kerberosloginuser", decryptionMap.get("kerberosloginuser"));
 			
@@ -395,16 +400,16 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 			throws DataSrcException, IOException, SQLException, ClassNotFoundException {
 
 		ArrayList<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false, authorization);
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		
 		if (dbDataSource.getCategory().equals("hive") && dbDataSource.getOwnedBy().equals(user)) {
-			Map<String, String> decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			Map<String, String> decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 			
 			StringBuilder resultString = null;
 			
 			log.info("getSampleResults(), restoring config files from codecloud...");
-			String kerberosConfigFileName = (ApplicationUtilities.getKerberosFileName(user, dbDataSource.getHdfsHiveDetails().getKerberosConfigFileId()) + ".krb5.conf");
-			String kerberosKeyTabFileName = (ApplicationUtilities.getKerberosFileName(user, dbDataSource.getHdfsHiveDetails().getKerberosKeyTabFileId()) + ".keytab");
+			String kerberosConfigFileName = (applicationUtilities.getKerberosFileName(user, dbDataSource.getHdfsHiveDetails().getKerberosConfigFileId()) + ".krb5.conf");
+			String kerberosKeyTabFileName = (applicationUtilities.getKerberosFileName(user, dbDataSource.getHdfsHiveDetails().getKerberosKeyTabFileId()) + ".keytab");
 			
 			//restore user exported config and KeyTab files
 			restoreKerberosUserConfigFiles(kerberosConfigFileName, kerberosKeyTabFileName, decryptionMap);
@@ -415,7 +420,7 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 			//successfully Restored the files
 			log.info("getSampleResults(), Kerberos files were restored successfully...Proceed with check connection");
 			
-			KerberosConfigInfo kerberosConfig = ApplicationUtilities.getKerberosConfigInfo(kerberosConfigFileName,
+			KerberosConfigInfo kerberosConfig = applicationUtilities.getKerberosConfigInfo(kerberosConfigFileName,
 					kerberosKeyTabFileName);
 
 			con = getConnection(dbDataSource.getCommonDetails().getServerName(),
@@ -423,7 +428,7 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 					kerberosConfig.getKerberosRealms());
 			
 			//Remove semicolon
-			dbDataSource.getHdfsHiveDetails().setQuery(ApplicationUtilities.trimSemicolonAtEnd(dbDataSource.getHdfsHiveDetails().getQuery()));
+			dbDataSource.getHdfsHiveDetails().setQuery(applicationUtilities.trimSemicolonAtEnd(dbDataSource.getHdfsHiveDetails().getQuery()));
 			
 			//preparing statement and executing it
 			Statement statement = con.createStatement();
@@ -504,7 +509,7 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 			}
 			
 			//delete the restored files
-			ApplicationUtilities.deleteUserKerberosConfigFiles(kerberosConfigFileName, kerberosKeyTabFileName);
+			applicationUtilities.deleteUserKerberosConfigFiles(kerberosConfigFileName, kerberosKeyTabFileName);
 			
 			return new ByteArrayInputStream(resultString.toString().getBytes());
 		}
@@ -531,8 +536,8 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 		log.info("ENTER:getHiveDatasetSize()");
 
 		int MIN_SAMPLING_SIZE; //default to 50
-		String strMIN_SAMPLING_SIZE = HelperTool.getEnv("minimum_sampling_size",
-				HelperTool.getComponentPropertyValue("minimum_sampling_size"));
+		String strMIN_SAMPLING_SIZE = helperTool.getEnv("minimum_sampling_size",
+				helperTool.getComponentPropertyValue("minimum_sampling_size"));
 		MIN_SAMPLING_SIZE = strMIN_SAMPLING_SIZE != null ? Integer.parseInt(strMIN_SAMPLING_SIZE) : 50;
 		
 		long size = 0L;
@@ -666,19 +671,19 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 		StringBuilder sb2 = new StringBuilder();
 		sb2.append(krbLoginUser.substring(0, krbLoginUser.indexOf("@"))).append(".kerberos.keytab");
 		
-		if(!ApplicationUtilities.isUserKerberosCacheConfigFilesExists(sb1.toString(), sb2.toString())) {
+		if(!applicationUtilities.isUserKerberosCacheConfigFilesExists(sb1.toString(), sb2.toString())) {
 			//Restore Kerberos Cache files if they are missed due to POD bounce
 			log.info("getSampleResults(), restoring config files from codecloud...");
 			
-			boolean isWritten = ApplicationUtilities.writeToKerberosCacheFile(sb1.toString(), decryptionMap.get("KerberosConfigFileContents".toLowerCase()));
+			boolean isWritten = applicationUtilities.writeToKerberosCacheFile(sb1.toString(), decryptionMap.get("KerberosConfigFileContents".toLowerCase()));
 			
 			if(isWritten) {
-				isWritten = ApplicationUtilities.writeToKerberosCacheFile(sb2.toString(), decryptionMap.get("KerberosKeyTabContent".toLowerCase()));
+				isWritten = applicationUtilities.writeToKerberosCacheFile(sb2.toString(), decryptionMap.get("KerberosKeyTabContent".toLowerCase()));
 			}
 			
 			if(!isWritten) {
 				//1. delete config files, if any
-				ApplicationUtilities.deleteUserKerberosCacheConfigFiles(sb1.toString(), sb2.toString());
+				applicationUtilities.deleteUserKerberosCacheConfigFiles(sb1.toString(), sb2.toString());
 				
 				//2. throw Exception
 				DataSrcRestError err = DataSrcErrorList.buildError(new Exception("Unable to retrieve connection parameters from the codecloud."), null, CmlpApplicationEnum.DATASOURCE);
@@ -691,15 +696,15 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 	
 	private void restoreKerberosUserConfigFiles(String krbConfigFileName, String krbKeyTabFileName, Map<String, String> decryptionMap) throws DataSrcException {
 		log.info("getSampleResults(), restoring config files from codecloud...");
-		boolean isWritten = ApplicationUtilities.writeToKerberosFile(krbConfigFileName, decryptionMap.get("KerberosConfigFileContents".toLowerCase()));
+		boolean isWritten = applicationUtilities.writeToKerberosFile(krbConfigFileName, decryptionMap.get("KerberosConfigFileContents".toLowerCase()));
 		
 		if(isWritten) {
-			isWritten = ApplicationUtilities.writeToKerberosFile(krbKeyTabFileName, decryptionMap.get("KerberosKeyTabContent".toLowerCase()));
+			isWritten = applicationUtilities.writeToKerberosFile(krbKeyTabFileName, decryptionMap.get("KerberosKeyTabContent".toLowerCase()));
 		}
 		
 		if(!isWritten) {
 			//1. delete config files, if any
-			ApplicationUtilities.deleteUserKerberosConfigFiles(krbConfigFileName, krbKeyTabFileName);
+			applicationUtilities.deleteUserKerberosConfigFiles(krbConfigFileName, krbKeyTabFileName);
 			
 			//2. throw Exception
 			DataSrcRestError err = DataSrcErrorList.buildError(new Exception("Unable to retrieve connection parameters from the codecloud."), null, CmlpApplicationEnum.DATASOURCE);
@@ -711,12 +716,12 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 	@Override
 	public InputStream getSampleResults(DataSourceModelGet dataSource) throws DataSrcException, IOException, SQLException, ClassNotFoundException {
 		//check for connection parameters
-		ApplicationUtilities.validateConnectionParameters(dataSource);
+		applicationUtilities.validateConnectionParameters(dataSource);
 		
 		String kerberosConfigFileName = dataSource.getHdfsHiveDetails().getKerberosConfigFileId();
 		String kerberosKeyTabFileName = dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId();
 
-		KerberosConfigInfo kerberosConfig = ApplicationUtilities.getKerberosConfigInfo(kerberosConfigFileName, kerberosKeyTabFileName);
+		KerberosConfigInfo kerberosConfig = applicationUtilities.getKerberosConfigInfo(kerberosConfigFileName, kerberosKeyTabFileName);
 
 		log.info("getSampleResults, Received following Kerberos config info from ConfigFile : "
 				+ dataSource.getHdfsHiveDetails().getKerberosConfigFileId());
@@ -743,12 +748,12 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 		log.info("Creating kerberos keytab for hostname " + dataSource.getCommonDetails().getServerName() + " using principal "
 				+ objKerberosLogin.getKerberosLoginUser() + " for hdfs connectivity testing.");
 
-		ApplicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());	
+		applicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());	
 	} else {
 		try {
 			log.info("overwriting kerberos keytab for hostname " + dataSource.getCommonDetails().getServerName() + " using principal "
 					+ objKerberosLogin.getKerberosLoginUser() + " for hdfs connectivity testing.");
-			ApplicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
+			applicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
 		} catch (Exception e) {
 			//ignore
 			e.printStackTrace();
@@ -765,7 +770,7 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 		}
 		
 		//Remove semicolon
-		dataSource.getHdfsHiveDetails().setQuery(ApplicationUtilities.trimSemicolonAtEnd(dataSource.getHdfsHiveDetails().getQuery()));
+		dataSource.getHdfsHiveDetails().setQuery(applicationUtilities.trimSemicolonAtEnd(dataSource.getHdfsHiveDetails().getQuery()));
 				
 
 		// preparing statement and executing it
@@ -776,7 +781,7 @@ public class HiveDataSourceSvcImpl implements HiveDataSourceSvc {
 		InputStream sample = populatingSample(results);
 
 		// delete the restored files
-		ApplicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
+		applicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
 				dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId());
 
 		return sample;

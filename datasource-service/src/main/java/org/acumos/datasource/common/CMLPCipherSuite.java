@@ -29,8 +29,6 @@ import javax.ws.rs.core.Response.Status;
 import org.acumos.datasource.exception.DataSrcException;
 
 import com.google.common.io.BaseEncoding;
-import com.mongodb.BasicDBObject;
-import com.mongodb.util.JSON;
 
 public class CMLPCipherSuite {
 	

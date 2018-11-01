@@ -75,6 +75,12 @@ public class DbUtilitiesV2 {
 	
 	@Autowired
 	private Environment env;
+	
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
 
 	public DbUtilitiesV2() {
 		super();
@@ -84,12 +90,12 @@ public class DbUtilitiesV2 {
 		
 		if(datasrcCollection == null) {
 
-			String userName = HelperTool.getEnv("datasrc_mongo_username", HelperTool.getComponentPropertyValue("datasrc_mongo_username"));
-			String password = HelperTool.getEnv("datasrc_mongo_password", HelperTool.getComponentPropertyValue("datasrc_mongo_password"));
-			String dbName = HelperTool.getEnv("datasrc_mongo_dbname", HelperTool.getComponentPropertyValue("datasrc_mongo_dbname"));
-			String hostName = HelperTool.getEnv("datasrc_mongo_hostname", HelperTool.getComponentPropertyValue("datasrc_mongo_hostname"));
-			String portNumber = HelperTool.getEnv("datasrc_mongo_port", HelperTool.getComponentPropertyValue("datasrc_mongo_port"));
-			String collectionName = HelperTool.getEnv("datasrc_mongo_collection_name", HelperTool.getComponentPropertyValue("datasrc_mongo_collection_name"));
+			String userName = helperTool.getEnv("datasrc_mongo_username", helperTool.getComponentPropertyValue("datasrc_mongo_username"));
+			String password = helperTool.getEnv("datasrc_mongo_password", helperTool.getComponentPropertyValue("datasrc_mongo_password"));
+			String dbName = helperTool.getEnv("datasrc_mongo_dbname", helperTool.getComponentPropertyValue("datasrc_mongo_dbname"));
+			String hostName = helperTool.getEnv("datasrc_mongo_hostname", helperTool.getComponentPropertyValue("datasrc_mongo_hostname"));
+			String portNumber = helperTool.getEnv("datasrc_mongo_port", helperTool.getComponentPropertyValue("datasrc_mongo_port"));
+			String collectionName = helperTool.getEnv("datasrc_mongo_collection_name", helperTool.getComponentPropertyValue("datasrc_mongo_collection_name"));
 			
 			WebConfig config = new WebConfig();
 			
@@ -103,12 +109,12 @@ public class DbUtilitiesV2 {
 		
 		if(datasrcCodeCloudCollection == null) {
 			
-			String userName = HelperTool.getEnv("datasrc_mongo_username", HelperTool.getComponentPropertyValue("datasrc_mongo_username"));
-			String password = HelperTool.getEnv("datasrc_mongo_password", HelperTool.getComponentPropertyValue("datasrc_mongo_password"));
-			String dbName = HelperTool.getEnv("datasrc_mongo_dbname", HelperTool.getComponentPropertyValue("datasrc_mongo_dbname"));
-			String hostName = HelperTool.getEnv("datasrc_mongo_hostname", HelperTool.getComponentPropertyValue("datasrc_mongo_hostname"));
-			String portNumber = HelperTool.getEnv("datasrc_mongo_port", HelperTool.getComponentPropertyValue("datasrc_mongo_port"));
-			String collectionName = HelperTool.getEnv("datasrc_mongo_codecloud_collection_name", HelperTool.getComponentPropertyValue("datasrc_mongo_codecloud_collection_name"));
+			String userName = helperTool.getEnv("datasrc_mongo_username", helperTool.getComponentPropertyValue("datasrc_mongo_username"));
+			String password = helperTool.getEnv("datasrc_mongo_password", helperTool.getComponentPropertyValue("datasrc_mongo_password"));
+			String dbName = helperTool.getEnv("datasrc_mongo_dbname", helperTool.getComponentPropertyValue("datasrc_mongo_dbname"));
+			String hostName = helperTool.getEnv("datasrc_mongo_hostname", helperTool.getComponentPropertyValue("datasrc_mongo_hostname"));
+			String portNumber = helperTool.getEnv("datasrc_mongo_port", helperTool.getComponentPropertyValue("datasrc_mongo_port"));
+			String collectionName = helperTool.getEnv("datasrc_mongo_codecloud_collection_name", helperTool.getComponentPropertyValue("datasrc_mongo_codecloud_collection_name"));
 			
 			WebConfig config = new WebConfig();
 			
@@ -235,12 +241,12 @@ public class DbUtilitiesV2 {
 			
 			if (dataSource.getHdfsHiveDetails().getKerberosConfigFileId() != null) {
 				hdfsHiveDetails.append("kerberosConfigFileId", 
-						ApplicationUtilities.getOriginalFileName(dataSource.getHdfsHiveDetails().getKerberosConfigFileId()));
+						applicationUtilities.getOriginalFileName(dataSource.getHdfsHiveDetails().getKerberosConfigFileId()));
 			}
 			
 			if (dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId() != null) {
 				hdfsHiveDetails.append("kerberosKeyTabFileId", 
-						ApplicationUtilities.getOriginalFileName(dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId()));
+						applicationUtilities.getOriginalFileName(dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId()));
 			}
 			
 			if (dataSource.getHdfsHiveDetails().getHdfsFoldername() != null) {
@@ -410,7 +416,7 @@ public class DbUtilitiesV2 {
 				if( tempStorage.containsField("dbDetails") ) {
 					BasicDBObject dbDetails = (BasicDBObject)tempStorage.get("dbDetails");
 					
-					Map<String, String> decrptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+					Map<String, String> decrptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 					if (dbDetails.containsField("dbServerUsername") && decrptionMap.get("dbServerUsername".toLowerCase()) != null){
 						dbDetails.put("dbServerUsername", decrptionMap.get("dbServerUsername".toLowerCase()));
 					}
@@ -424,7 +430,7 @@ public class DbUtilitiesV2 {
 				if( tempStorage.containsField("hdfsHiveDetails") ) {
 					BasicDBObject hdfsDetails = (BasicDBObject)tempStorage.get("hdfsHiveDetails");
 				
-					Map<String, String> decrptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+					Map<String, String> decrptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 					if (hdfsDetails.containsField("kerberosLoginUser") && decrptionMap.get("KerberosLoginUser".toLowerCase()) != null){
 						hdfsDetails.put("kerberosLoginUser", decrptionMap.get("KerberosLoginUser".toLowerCase()));
 					}
@@ -435,7 +441,7 @@ public class DbUtilitiesV2 {
 				if( tempStorage.containsField("fileDetails") ) {
 					BasicDBObject fileDetails = (BasicDBObject)tempStorage.get("fileDetails");
 
-					Map<String, String> decrptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+					Map<String, String> decrptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 					if (fileDetails.containsField("fileServerUserName") && decrptionMap.get("dbServerUsername".toLowerCase()) != null){
 						fileDetails.put("fileServerUserName", decrptionMap.get("dbServerUsername".toLowerCase())); //encrypted as dbServerUsername
 					}
@@ -772,6 +778,7 @@ public class DbUtilitiesV2 {
 		}
 
 		log.info("getCredentialFromCodeCloud(), running query");
+		
 		DBObject result = getMongoCollectionForCodeCloud().findOne(query.get());
 		
 		if(result != null) {	
