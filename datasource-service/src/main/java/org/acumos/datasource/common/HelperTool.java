@@ -35,6 +35,12 @@ import java.net.Socket;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Properties;
@@ -44,11 +50,10 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 
 import org.acumos.datasource.exception.DataSrcException;
-import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -57,20 +62,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import com.google.common.io.BaseEncoding;
-
-import java.nio.file.Paths;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.nio.file.StandardCopyOption;
 
 /**
  * <p>
@@ -81,13 +79,17 @@ import java.nio.file.StandardCopyOption;
  * @since Feb 23, 2017
  * @version $Id$
  */
+@Component
 public class HelperTool {
 	private static Logger log = LoggerFactory.getLogger(HelperTool.class);
 	
 	private static String _apiVersion;
 	private static String _resourceURL;
+	
+	@Autowired
+	Environment env;
 
-	public static String getComponentPropertyValue(String key) throws IOException {
+	public String getComponentPropertyValue(String key) throws IOException {
 		try {
 			Properties prop = new Properties();
 			InputStream input;
@@ -108,7 +110,7 @@ public class HelperTool {
 		return "";
 	}
 	
-	public static String getComponentPropertyValue(String key, String defaultValue) throws IOException {
+	public String getComponentPropertyValue(String key, String defaultValue) throws IOException {
 		try {
 			Properties prop = new Properties();
 			InputStream input;
@@ -138,7 +140,7 @@ public class HelperTool {
 
 
 	
-	public static boolean isPath(String text) {
+	public boolean isPath(String text) {
 
 		if (text == null) {
 			return false;
@@ -149,7 +151,7 @@ public class HelperTool {
 	}
 
 	
-	public static boolean isFileExists(String text) throws IOException {
+	public boolean isFileExists(String text) throws IOException {
 
 		if (text == null) {
 			return false;
@@ -165,7 +167,7 @@ public class HelperTool {
 	}
 
 	
-	public static boolean isFileUrl(String urlString) {
+	public boolean isFileUrl(String urlString) {
 		try {
 			new URL(urlString);
 			return true;
@@ -185,7 +187,7 @@ public class HelperTool {
 	}
 
 	
-	public static String readHttpURLtoString(URL urlPath) throws IOException {
+	public String readHttpURLtoString(URL urlPath) throws IOException {
 		String outcome = null;
 		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlPath.openStream()))) {
 			StringBuilder stringBuilder = new StringBuilder();
@@ -201,7 +203,7 @@ public class HelperTool {
 	}
 
 	
-	public static void writeKeytab(String kerberosLoginuser, String content) throws IOException {
+	public void writeKeytab(String kerberosLoginuser, String content) throws IOException {
 		File keyFile = new File(System.getProperty("user.dir") + System.getProperty("file.separator")
 				+ extractUsername(kerberosLoginuser) + "." + "kerberos.keytab");
 		keyFile.createNewFile();
@@ -212,7 +214,7 @@ public class HelperTool {
 	}
 	
 	
-	public static void writeKeytab(String kerberosLoginuser, String content, String kerberosKeyTabFileName) throws IOException {
+	public void writeKeytab(String kerberosLoginuser, String content, String kerberosKeyTabFileName) throws IOException {
 		StringBuilder sb1 = new StringBuilder();
 		sb1.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
 			.append(extractUsername(kerberosLoginuser)).append(".kerberos.keytab");
@@ -235,7 +237,7 @@ public class HelperTool {
 			//Copy the file as it is
 			StringBuilder sb2 = new StringBuilder();
 			sb2.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
-			  .append(HelperTool.getEnv("kerberos_user_config_dir", HelperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
+			  .append(getEnv("kerberos_user_config_dir", getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
 			  .append(System.getProperty("file.separator"))
 			  .append(kerberosKeyTabFileName);
 			
@@ -250,7 +252,7 @@ public class HelperTool {
 	}
 
 	
-	public static void updateKrb5Conf(String kerberosLoginuser, String kerberosrealms, String kerberoskdc,
+	public void updateKrb5Conf(String kerberosLoginuser, String kerberosrealms, String kerberoskdc,
 			String kerbersoadminserver, String kerberospasswordserver, String kerberosdomainname) throws IOException {
 		File outputfilePath = new File(System.getProperty("user.dir") + System.getProperty("file.separator")
 				+ extractUsername(kerberosLoginuser) + "." + "krb5.conf");
@@ -271,14 +273,14 @@ public class HelperTool {
 		}
 	}
 	
-	public static void updateKrb5Conf(String kerberosLoginuser, String kerberosConfigFileName) throws IOException {
+	public void updateKrb5Conf(String kerberosLoginuser, String kerberosConfigFileName) throws IOException {
 		StringBuilder sb1 = new StringBuilder();
 		sb1.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
 			.append(extractUsername(kerberosLoginuser)).append(".krb5.conf");
 		
 		StringBuilder sb2 = new StringBuilder();
 		sb2.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
-		  .append(HelperTool.getEnv("kerberos_user_config_dir", HelperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
+		  .append(getEnv("kerberos_user_config_dir", getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
 		  .append(System.getProperty("file.separator"))
 		  .append(kerberosConfigFileName);
 		
@@ -286,12 +288,12 @@ public class HelperTool {
 	}
 
 	
-	public static String extractUsername(String userName) {
+	public String extractUsername(String userName) {
 		return (userName.indexOf("@") > 0) ? userName.substring(0, userName.indexOf("@")) : userName;
 
 	}
 
-	public static boolean isFileinHttp(URL urlPath) {
+	public boolean isFileinHttp(URL urlPath) {
 		try {
 			readHttpURLtoString(urlPath);
 		} catch (Exception e) {
@@ -301,7 +303,7 @@ public class HelperTool {
 	}
 
 	
-	public static boolean isHTTPServerOnline(String ipAddress, int port) {
+	public boolean isHTTPServerOnline(String ipAddress, int port) {
 		boolean b = true;
 		try {
 			InetSocketAddress sa = new InetSocketAddress(ipAddress, port);
@@ -314,7 +316,7 @@ public class HelperTool {
 		return b;
 	}
 
-	public static String getRemoteUser(HttpServletRequest request)  throws DataSrcException {
+	public String getRemoteUser(HttpServletRequest request)  throws DataSrcException {
 		String user = null;
 		
 		if (request.getRemoteUser() != null) {
@@ -348,13 +350,20 @@ public class HelperTool {
 		return user;
 	}
 
-	public static String getEnv(String envKey, String defaultValue) {
+	public String getEnv(String envKey, String defaultValue) {
 		
-		String value = System.getenv(envKey);
+		String value = null;
+		
+		value = env.getProperty(envKey);
+		
+		if(value == null) {
+			value = System.getenv(envKey);
+		}
 		
 		if (value == null) {
 			value = System.getProperty(envKey);
 		}
+		
 		if (value == null) {
 			value = defaultValue;
 		}
@@ -362,14 +371,14 @@ public class HelperTool {
 		return value;
 	}
 
-	public static void setEnv(String envKey, String value) {
+	public void setEnv(String envKey, String value) {
 		if (value != null) {
 			System.setProperty(envKey, value);
 		}
 	}
 
 	
-	public static String getJSONfromHttpResponse(String url, String path, String codeCloudAuthorization)
+	public String getJSONfromHttpResponse(String url, String path, String codeCloudAuthorization)
 			throws IOException {
 		Client client = ClientBuilder.newClient();
 		WebTarget webResource = client.target(UriBuilder.fromUri(url).build());
@@ -384,7 +393,7 @@ public class HelperTool {
 		return result.toString();
 	}
 
-	public static String getJSONfromHttpResponse(String url, String path, String authorization,
+	public String getJSONfromHttpResponse(String url, String path, String authorization,
 			String codeCloudAuthorization) throws IOException {
 		Client client = ClientBuilder.newClient();
 		WebTarget webResource = client.target(UriBuilder.fromUri(url).build());
@@ -400,7 +409,7 @@ public class HelperTool {
 	}
 
 	
-	public static Response getResponsefromHttpResponse(String url, String path, String authorization,
+	public Response getResponsefromHttpResponse(String url, String path, String authorization,
 			String codeCloudAuthorization) {
 		Client client = ClientBuilder.newClient();
 		WebTarget webResource = client.target(UriBuilder.fromUri(url).build());
@@ -411,7 +420,7 @@ public class HelperTool {
 	}
 
 	
-	public static byte[] getOutputStreamfromHttpResponse(String url, String path, String authorization,
+	public byte[] getOutputStreamfromHttpResponse(String url, String path, String authorization,
 			String codeCloudAuthorization, String destinationFileName) {
 		Client client = ClientBuilder.newClient();
 		WebTarget webResource = client.target(UriBuilder.fromUri(url).build());
@@ -422,7 +431,7 @@ public class HelperTool {
 		return outputStream;
 	}
 
-	public static void unZipper(String inputZipFile, String unzipDir) throws IOException {
+	public void unZipper(String inputZipFile, String unzipDir) throws IOException {
 		// create output directory is not exists. If exists drop the folder and
 		// recreate it.
 		File outfolder = new File(unzipDir);
@@ -467,7 +476,7 @@ public class HelperTool {
 
 	}
 
-	public static void removeDirectory(File directory) {
+	public void removeDirectory(File directory) {
 		if (directory.isDirectory()) {
 			File[] files = directory.listFiles();
 			if (files != null && files.length > 0) {
@@ -481,7 +490,7 @@ public class HelperTool {
 		}
 	}
 
-	public static void cleanDirectory(File directory) {
+	public void cleanDirectory(File directory) {
 		if (directory.isDirectory()) {
 			File[] files = directory.listFiles();
 			if (files != null && files.length > 0) {
@@ -494,7 +503,7 @@ public class HelperTool {
 	}
 	
 	
-	public static Configuration getKerberisedConfiguration(String hostName, String kerberosloginUser)
+	public Configuration getKerberisedConfiguration(String hostName, String kerberosloginUser)
 			throws IOException {
 		//hostname without hdfs is a deprecated setting for hadoop
 		if(!hostName.startsWith("hdfs://")) {
@@ -682,7 +691,7 @@ public class HelperTool {
 	
 
 	
-	public static String getAPIVersion(HttpServletRequest request) {
+	public String getAPIVersion(HttpServletRequest request) {
 		if(_apiVersion == null) {
 			
 			try {
@@ -707,18 +716,18 @@ public class HelperTool {
 		return _apiVersion;
 	}
 	
-	public static String getAPIVersion() {
+	public String getAPIVersion() {
 		
 		return _apiVersion;
 	}
 	
 
-	public static void  validateWriteBackDataSize(long dataSize)throws DataSrcException{
+	public void  validateWriteBackDataSize(long dataSize)throws DataSrcException{
 		long writeBackDataSizeLimit= 100;
 		long writeBackDataSize = 0;
 		try{
 			log.info("validateWriteBackDataSize():");
-			writeBackDataSizeLimit = Integer.parseInt(HelperTool.getEnv("writeBackDataSizeLimit",HelperTool.getComponentPropertyValue("writeBackDataSizeLimit")));
+			writeBackDataSizeLimit = Integer.parseInt(getEnv("writeBackDataSizeLimit",getComponentPropertyValue("writeBackDataSizeLimit")));
 			//writeBackDataSize = data.getBytes().length/1024;
 			writeBackDataSize = dataSize/1024;
 		} catch (Exception e) {
@@ -735,20 +744,26 @@ public class HelperTool {
 	}
 	
 	
-	public static String getResourceURL(HttpServletRequest request) {
+	public String getResourceURL(HttpServletRequest request) {
 		try {
 			if(_resourceURL == null) {
 				String requestURL = request.getRequestURL().toString();
 				String requestURI = request.getRequestURI().toString();
 				
 				String baseURL = requestURL.substring(0, requestURL.indexOf(requestURI));
-				String ingress_path = HelperTool.getEnv("ingress_service_path",
-						HelperTool.getComponentPropertyValue("ingress_service_path"));
+				String ingress_path = getEnv("ingress_service_path", getComponentPropertyValue("ingress_service_path"));
 				
-				StringBuilder sb = new StringBuilder();
-				sb.append(baseURL).append("/").append(ingress_path).append(requestURI);
-				
-				_resourceURL = sb.toString();
+				 if(ingress_path != null && !ingress_path.isEmpty()) 
+				 {
+					 StringBuilder sb = new StringBuilder(); 
+					 sb.append(baseURL).append("/").append(ingress_path).append(requestURI);  
+					 _resourceURL = sb.toString(); 
+				 } 
+				 else
+				 {
+					 _resourceURL = requestURL; 
+				 }
+				 
 				
 				log.info("requestURL: " + requestURL);
 				log.info("requestURI: " + requestURI);

@@ -27,22 +27,37 @@
 #      SPRING_APPLICATION_JSON: '{}'
 
 # The server port number is chosen RANDOMLY when running a test
-server.port = 8030
+server.port = 8081
 
 # The following properties are similar in all deployments.
 
 # REST endpoint configuration; i.e., where this server listens
 server.contextPath=/datasource-service
 
+security.user.name=dummy
+security.user.password =dummy
 
-security.user.name=
-security.user.password =
+datasource_sample_size=6
+minimum_sampling_size=50
 
-datasrc_mongo_username=
-datasrc_mongo_password=
-datasrc_mongo_dbname=
-datasrc_mongo_hostname=
-datasrc_mongo_port=
-datasrc_mongo_collection_name=
+#MONGO DB
+datasrc_mongo_username=dummy
+datasrc_mongo_password=dummy
+datasrc_mongo_dbname=DUMMY_DB
+datasrc_mongo_hostname=localhost
+datasrc_mongo_port=27017
+datasrc_mongo_collection_name=datasrc_collection
+datasrc_mongo_codecloud_collection_name=datasrc_cc_collection
 
-kerberos_user_config_dir=
+kerberos_user_config_dir=kerberos
+dataSource_delete_type=softdelete
+
+#HDFS
+kerberos_sample_config_file=<id>.krb5.conf
+kerberos_sample_keytab_file=<id>.kerberos.keytab
+
+writeBackDataSizeLimit=100
+
+#FILE DATASOURCE NEED PROXY IF RUNNING INSIDE COORPORATE
+proxy_host=
+proxy_port=

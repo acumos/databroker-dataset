@@ -21,13 +21,8 @@
 package org.acumos.datasource.service;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,10 +30,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.slf4j.LoggerFactory;
 
 import org.acumos.datasource.common.CmlpApplicationEnum;
 import org.acumos.datasource.common.DataSrcErrorList;
@@ -54,6 +45,10 @@ import org.acumos.datasource.schema.DataSourceModelGet;
 import org.acumos.datasource.schema.NameValue;
 import org.acumos.datasource.utils.ApplicationUtilities;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.Metadata;
@@ -75,6 +70,12 @@ public class CassandraDataSourceSvcImpl implements CassandraDataSourceSvc {
 
 	@Autowired
 	private DbUtilitiesV2 dbUtilities;
+	
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
 
 	@Override
 	public String getConnectionStatus(CassandraConnectionModel objCassandraConnectionModel, String query)
@@ -208,14 +209,14 @@ public class CassandraDataSourceSvcImpl implements CassandraDataSourceSvc {
 			throws DataSrcException, IOException {
 
 		ArrayList<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false, authorization);
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		
 		if (dbDataSource.getCategory().equals("cassandra") && dbDataSource.getOwnedBy().equals(user)) {
 			ResultSet results = null;
 			StringBuilder builderObject = new StringBuilder();
 			Map<String, String> decryptionMap = new HashMap<>();
 
-			decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 					
 			log.info("getResults, using credetials, initializing cassandra cluster");
 			session = getSession(dbDataSource.getCommonDetails().getServerName(), dbDataSource.getCommonDetails().getPortNumber(),
@@ -300,13 +301,13 @@ public class CassandraDataSourceSvcImpl implements CassandraDataSourceSvc {
 
 		ArrayList<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false, authorization);
 		
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 
 		if (dbDataSource.getCategory().equals("cassandra") && dbDataSource.getOwnedBy().equals(user)) {
 			ResultSet results = null;
 			Map<String, String> decryptionMap = new HashMap<>();
 			
-			decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 
 			log.info("getMetadataResults: using credetials, initializing cassandra cluster");
 
@@ -371,7 +372,7 @@ public class CassandraDataSourceSvcImpl implements CassandraDataSourceSvc {
 			throws DataSrcException, IOException {
 		log.info( "ENTER:CassandraDataSourceSvcImpl::getSampleResults");
 		int rowsLimit; //default to 5
-		String strRowsLimit = HelperTool.getEnv("datasource_sample_size", HelperTool.getComponentPropertyValue("datasource_sample_size"));
+		String strRowsLimit = helperTool.getEnv("datasource_sample_size", helperTool.getComponentPropertyValue("datasource_sample_size"));
 		rowsLimit = strRowsLimit != null ? Integer.parseInt(strRowsLimit) : 5;
 
 		log.info( "RETURN:CassandraDataSourceSvcImpl::getSampleResults");
@@ -386,7 +387,7 @@ public class CassandraDataSourceSvcImpl implements CassandraDataSourceSvc {
 
 		ArrayList<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false, authorization);
 		
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		
 		if (dbDataSource.getCategory().equals("cassandra")
 				&& dbDataSource.getOwnedBy().equals(user)) {
@@ -395,7 +396,7 @@ public class CassandraDataSourceSvcImpl implements CassandraDataSourceSvc {
 			StringBuilder builderObject = new StringBuilder();
 			Map<String, String> decryptionMap = new HashMap<>();
 
-			decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 
 			log.info("\nCassandraDataSourceSvcImpl::getDatasetSampleData, using credetials, initializing cassandra cluster");
 			session = getSession(dbDataSource.getCommonDetails().getServerName(), 
@@ -507,8 +508,8 @@ public class CassandraDataSourceSvcImpl implements CassandraDataSourceSvc {
 	public long getCassandraDatasetSize(ResultSet results, int rowCount) throws SQLException, IOException, DataSrcException {
 		log.info( "ENTER:getCassandraDatasetSize");
 		int MIN_SAMPLING_SIZE; //default to 50
-		String strMIN_SAMPLING_SIZE = HelperTool.getEnv("minimum_sampling_size",
-				HelperTool.getComponentPropertyValue("minimum_sampling_size"));
+		String strMIN_SAMPLING_SIZE = helperTool.getEnv("minimum_sampling_size",
+				helperTool.getComponentPropertyValue("minimum_sampling_size"));
 		MIN_SAMPLING_SIZE = strMIN_SAMPLING_SIZE != null ? Integer.parseInt(strMIN_SAMPLING_SIZE) : 50;
 
 		long size = 0L;
@@ -663,7 +664,7 @@ public class CassandraDataSourceSvcImpl implements CassandraDataSourceSvc {
 	@Override
 	public InputStream getSampleResults(DataSourceModelGet dataSource) throws DataSrcException {
 		log.info("\nCassandraDataSourceSvcImpl::getSampleResults, using credetials, initializing cassandra cluster");
-		ApplicationUtilities.validateConnectionParameters(dataSource);
+		applicationUtilities.validateConnectionParameters(dataSource);
 		
 		session = getSession(dataSource.getCommonDetails().getServerName(), 
 				dataSource.getCommonDetails().getPortNumber(),

@@ -157,13 +157,16 @@ public class DataSetServiceImplV2 implements DataSetServiceV2 {
 	@Autowired
 	private DbUtilities_v2 dbUtilities;
 	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
+	
 	private void insertDataset2(DatasetModelGet dataSet, String authorization) throws DataSetException, JSONException, IOException {
 		String datasourceKey = dataSet.getDatasourceKey();
 		log.info(INTIATING_HTTP_CALL_FOR_FETCHING_DETAILS_ABOUT_A_DATASOURCE);
-		InputStream response = ApplicationUtilities.getDataSource(authorization, datasourceKey);
+		InputStream response = applicationUtilities.getDataSource(authorization, datasourceKey);
 
 		log.info(INSERT_DATA_SET_RECEIVED_OK_RESPONSE_FROM_DATA_SOURCE_MGR_READING_THE_DETAILS);
-		String strResponse = ApplicationUtilities.getDatasourceResponseFromInputStream(response).trim();
+		String strResponse = applicationUtilities.getDatasourceResponseFromInputStream(response).trim();
 
 		// check for OK with no response message
 		if (strResponse.length() == 0) {
@@ -216,10 +219,10 @@ public class DataSetServiceImplV2 implements DataSetServiceV2 {
 		DatasetModelGet dataSet = new DatasetModelGet(dataSetPost);
 
 		log.info(VALIDATE_DATASET_DETAILS_FOR_REQUIRED_FIELDS);
-		ApplicationUtilities.validateDatasetModel(dataSet, dbUtilities, "create");
+		applicationUtilities.validateDatasetModel(dataSet, dbUtilities, "create");
 
 		dataSet.setOwnedBy(user);
-		dataSet.setDatasetKey(ApplicationUtilities.getName(user));
+		dataSet.setDatasetKey(applicationUtilities.getName(user));
 		log.info(THE_DATASET_HAS_BEEN_POPULATED_BY_FOLLOWING_KEY + dataSet.getDatasetKey());
 
 		if (dataSet.getDatasourceKey() != null && !dataSet.getDatasourceKey().isEmpty()) { //Associate Datasource
@@ -278,12 +281,12 @@ public class DataSetServiceImplV2 implements DataSetServiceV2 {
 
 		if (datasourceKey != null && datasourceKey.trim().length() > 0) { // Associating datasource
 			log.info(THE_INPUT_HAS_A_DATA_SOURCE_KEY_ASSOCIATING_DATASOURCE + datasourceKey);
-			InputStream inStream = ApplicationUtilities.getDataSource(authorization, datasourceKey);
+			InputStream inStream = applicationUtilities.getDataSource(authorization, datasourceKey);
 
 
 			
 			log.info(UPDATE_DATA_SET_DETAIL_RECEIVED_OK_RESPONSE_FROM_DATA_SOURCE_MGR_READING_THE_DETAILS);
-			String strResponse = ApplicationUtilities.getDatasourceResponseFromInputStream(inStream);
+			String strResponse = applicationUtilities.getDatasourceResponseFromInputStream(inStream);
 
 			// check for OK with no response message
 			if (strResponse.trim().length() == 0) {
@@ -343,7 +346,7 @@ public class DataSetServiceImplV2 implements DataSetServiceV2 {
 		}
 		
 		log.info(VALIDATE_DATASET_DETAILS_FOR_REQUIRED_FIELDS);
-		ApplicationUtilities.validateDatasetModel(dataSet, dbUtilities, UPDATE);
+		applicationUtilities.validateDatasetModel(dataSet, dbUtilities, UPDATE);
 			
 		String dbDatasourceKey = null;
 
@@ -368,7 +371,7 @@ public class DataSetServiceImplV2 implements DataSetServiceV2 {
 				
 			}
 		} else if(dbDatasets != null) {
-			dbDatasourceKey = ApplicationUtilities.getFieldValueFromJsonString(dbDatasets.get(0), DATASOURCE_KEY);
+			dbDatasourceKey = applicationUtilities.getFieldValueFromJsonString(dbDatasets.get(0), DATASOURCE_KEY);
 			log.info("updateDataSetDetail(), The Datasource key in DB :" + dbDatasourceKey);
 		}
 
@@ -447,7 +450,7 @@ public class DataSetServiceImplV2 implements DataSetServiceV2 {
 			}
 		}
 
-		String datasourceKey = ApplicationUtilities.getFieldValueFromJsonString(datasetDetails.get(0), DATASOURCE_KEY);
+		String datasourceKey = applicationUtilities.getFieldValueFromJsonString(datasetDetails.get(0), DATASOURCE_KEY);
 		
 		if (datasourceKey == null) {
 			String[] variables = {DATASOURCE_KEY};
@@ -504,10 +507,10 @@ public class DataSetServiceImplV2 implements DataSetServiceV2 {
 		//Associate Datasource
 		
 		log.info(INTIATING_HTTP_CALL_FOR_FETCHING_DETAILS_ABOUT_A_DATASOURCE);
-		InputStream response = ApplicationUtilities.getDataSource(authorization, datasourceKey);
+		InputStream response = applicationUtilities.getDataSource(authorization, datasourceKey);
 
 		log.info(UPDATE_DATA_SOURCE_KEY_RECEIVED_OK_RESPONSE_FROM_DATA_SOURCE_MGR_READING_THE_DETAILS);
-		String strResponse = ApplicationUtilities.getDatasourceResponseFromInputStream(response);
+		String strResponse = applicationUtilities.getDatasourceResponseFromInputStream(response);
 
 		// check for OK with no response message
 		if (strResponse.trim().length() == 0) {
@@ -539,7 +542,7 @@ public class DataSetServiceImplV2 implements DataSetServiceV2 {
 					Status.BAD_REQUEST.getStatusCode(), err);
 		}
 		
-		String datasourceKey = ApplicationUtilities.getFieldValueFromJsonString(datasetDetails.get(0), DATASOURCE_KEY);	
+		String datasourceKey = applicationUtilities.getFieldValueFromJsonString(datasetDetails.get(0), DATASOURCE_KEY);	
 		if (datasourceKey == null) {
 			String[] variables = {DATASOURCE_KEY};
 			DataSetRestError err = DataSetErrorList.buildError(ErrorListEnum.E_0003, variables, null, CmlpApplicationEnum.DATASET);		
@@ -547,7 +550,7 @@ public class DataSetServiceImplV2 implements DataSetServiceV2 {
 						Status.NOT_FOUND.getStatusCode(), err);
 		}
 		
-		ApplicationUtilities.executeWriteback(authorization, datasourceKey, dataFile);
+		applicationUtilities.executeWriteback(authorization, datasourceKey, dataFile);
 		
 	}
 

@@ -23,11 +23,10 @@ package org.acumos.datasource.service;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.hadoop.conf.Configuration;
-
 import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.model.KerberosLogin;
 import org.acumos.datasource.schema.DataSourceMetadata;
+import org.apache.hadoop.conf.Configuration;
 
 public interface HdpBatchDataSourceSvc {
 	
