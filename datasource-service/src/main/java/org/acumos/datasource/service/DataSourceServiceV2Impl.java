@@ -27,11 +27,19 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response.Status;
+
+import org.acumos.datasource.common.CmlpApplicationEnum;
+import org.acumos.datasource.common.DataSrcErrorList;
+import org.acumos.datasource.common.DataSrcRestError;
+import org.acumos.datasource.common.ErrorListEnum;
+import org.acumos.datasource.common.HelperTool;
+import org.acumos.datasource.common.KerberosConfigInfo;
 import org.acumos.datasource.connection.DbUtilitiesV2;
 import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.model.CassandraConnectionModel;
@@ -47,19 +55,11 @@ import org.acumos.datasource.schema.DataSourceModelPost;
 import org.acumos.datasource.schema.DataSourceModelPut;
 import org.acumos.datasource.utils.ApplicationUtilities;
 import org.json.JSONObject;
-import org.acumos.datasource.common.CmlpApplicationEnum;
-import org.acumos.datasource.common.DataSrcErrorList;
-import org.acumos.datasource.common.DataSrcRestError;
-import org.acumos.datasource.common.ErrorListEnum;
-import org.acumos.datasource.common.HelperTool;
-import org.acumos.datasource.common.KerberosConfigInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.ws.rs.core.Response.Status;
 
 @Service
 public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
@@ -101,6 +101,12 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 
 	@Autowired
 	private HiveBatchDataSourceSvcImpl hiveBatchSvc;
+	
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
 
 	@Override
 	public List<String> getDataSourcesList(String user, String authorization, String namespace, String category,
@@ -132,8 +138,8 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 			validateDataSource(user, datasourceKey);
 			
 			String deleteType = "";
-			deleteType = HelperTool.getEnv("dataSource_delete_type",
-					HelperTool.getComponentPropertyValue("dataSource_delete_type"));
+			deleteType = helperTool.getEnv("dataSource_delete_type",
+					helperTool.getComponentPropertyValue("dataSource_delete_type"));
 			deleteType = deleteType != null ? deleteType : "softdelete";
 			if (deleteType.equals("softdelete"))
 				return dbUtilities.softDeleteDataSource(user, datasourceKey);
@@ -158,7 +164,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 		DataSourceModelGet dataSource = new DataSourceModelGet(dataSourcePost);
 		dataSource.setOwnedBy(user);
 		
-		dataSource = ApplicationUtilities.validateInputRequest(dataSource, "create");
+		dataSource = applicationUtilities.validateInputRequest(dataSource, "create");
 		
 		
 		dataSource.setOwnedBy(user);
@@ -167,7 +173,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 		String serverName = "";
 		if(dataSource.getCommonDetails() != null && dataSource.getCommonDetails().getServerName() != null)
 			serverName = dataSource.getCommonDetails().getServerName();
-		dataSource.setDatasourceKey(ApplicationUtilities.getName(dataSource.getNamespace(), dataSource.getCategory(), serverName, user));
+		dataSource.setDatasourceKey(applicationUtilities.getName(dataSource.getNamespace(), dataSource.getCategory(), serverName, user));
 		
 		log.info("saveDataSourceDetail, key for new datasource detail: " + dataSource.getDatasourceKey());
 		log.info("saveDataSourceDetail, category for new datasource detail: " + dataSource.getCategory());
@@ -183,7 +189,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 
 			// clean up process
 			if (dataSource.getHdfsHiveDetails() != null && dataSource.getHdfsHiveDetails().getKerberosConfigFileId() != null) {
-				ApplicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
+				applicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
 						dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId());
 			}
 
@@ -192,12 +198,12 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 		} else {
 			// clean up process
 			if (dataSource.getHdfsHiveDetails() != null && dataSource.getHdfsHiveDetails().getKerberosConfigFileId() != null) {
-				ApplicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
+				applicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
 						dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId());
 			}
 
 			log.info("saveDataSourceDetail, Failed to create a new datasource : " + dataSource.getDatasourceKey());
-			ApplicationUtilities.raiseConnectionFailedException(dataSource.getCategory());
+			applicationUtilities.raiseConnectionFailedException(dataSource.getCategory());
 		}
 		
 		return null;
@@ -221,7 +227,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 			log.info("updateDataSourceDetail, logged in user: " + user);
 	
 			//Validate input parameters
-			dataSource = ApplicationUtilities.validateInputRequest(dataSource, "update");
+			dataSource = applicationUtilities.validateInputRequest(dataSource, "update");
 	
 			log.info("updateDataSourceDetail, key for new datasource detail: " + dataSource.getDatasourceKey());
 			log.info("updateDataSourceDetail, category for new datasource detail: " + dataSource.getCategory());
@@ -232,7 +238,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 	
 				// clean up process
 				if (dataSource.getHdfsHiveDetails() != null && dataSource.getHdfsHiveDetails().getKerberosConfigFileId() != null) {
-					ApplicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
+					applicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
 							dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId());
 				}
 				
@@ -241,11 +247,11 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 			} else {
 				// clean up process
 				if (dataSource.getHdfsHiveDetails() != null && dataSource.getHdfsHiveDetails().getKerberosConfigFileId() != null) {
-					ApplicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
+					applicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
 							dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId());
 				}
 				
-				ApplicationUtilities.raiseConnectionFailedException(dataSource.getCategory());
+				applicationUtilities.raiseConnectionFailedException(dataSource.getCategory());
 			}
 			
 			return false;
@@ -332,12 +338,12 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 			List<String> dbObjects = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, false, true, authorization);
 			
 			if(dbObjects != null && dbObjects.size() > 0) {
-				dataSource = ApplicationUtilities.getDataSourceModel(dbObjects.get(0));
+				dataSource = applicationUtilities.getDataSourceModel(dbObjects.get(0));
 			}
 		}
 
 		//validate input for the required connection parameters
-		ApplicationUtilities.validateConnectionParameters(dataSource);
+		applicationUtilities.validateConnectionParameters(dataSource);
 		
 		if ("create".equalsIgnoreCase(mode))
 			isCreate = true;
@@ -359,7 +365,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 						dataSource.getDatasourceKey(), null, false, true, authorization);
 
 				log.info("checkDataSourcesDetails(), Building datasourcemodel...");
-				DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+				DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 
 				log.info("checkDataSourcesDetails(), Request kerberosConfigFileName : "
 						+ dataSource.getHdfsHiveDetails().getKerberosConfigFileId());
@@ -381,27 +387,27 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 					log.info(
 							"checkDataSourcesDetails(), Kerberos files were NOT updated. Need to restore config files from codecloud...");
 					dataSource.getHdfsHiveDetails().setKerberosConfigFileId(
-							ApplicationUtilities.getKerberosFileName(user, dataSource.getHdfsHiveDetails().getKerberosConfigFileId()) + ".krb5.conf");
+							applicationUtilities.getKerberosFileName(user, dataSource.getHdfsHiveDetails().getKerberosConfigFileId()) + ".krb5.conf");
 					dataSource.getHdfsHiveDetails().setKerberosKeyTabFileId(
-							ApplicationUtilities.getKerberosFileName(user, dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId()) + ".keytab");
+							applicationUtilities.getKerberosFileName(user, dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId()) + ".keytab");
 	
-					Map<String, String> decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, dataSource.getDatasourceKey());
+					Map<String, String> decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, dataSource.getDatasourceKey());
 
-					boolean isWritten = ApplicationUtilities.writeToKerberosFile(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
+					boolean isWritten = applicationUtilities.writeToKerberosFile(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
 							decryptionMap.get("KerberosConfigFileContents".toLowerCase()));
 
 					if (isWritten) {
-						isWritten = ApplicationUtilities.writeToKerberosFile(dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId(),
+						isWritten = applicationUtilities.writeToKerberosFile(dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId(),
 								decryptionMap.get("KerberosKeyTabContent".toLowerCase()));
 					}
 
 					if (!isWritten) {
 						// 1. delete config files, if any
-						ApplicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
+						applicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
 								dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId());
 
 						// 2. throw Exception
-						ApplicationUtilities.raiseConnectionFailedException(dataSource.getCategory());
+						applicationUtilities.raiseConnectionFailedException(dataSource.getCategory());
 					}
 
 					// successfully Restored the files
@@ -446,7 +452,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 					encryptionMap.put("DbServerPassword", dataSource.getDbDetails().getDbServerPassword());
 					
 					//enAssociation = Utilities.writeToCodeCloud(authorization, codeCloudAuthorization, dataSource.getDatasourceKey(), encryptionMap);
-					enAssociation = ApplicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
+					enAssociation = applicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
 					
 					dataSource.getDbDetails().setDbServerUsername(enAssociation);
 					dataSource.getDbDetails().setDbServerPassword(enAssociation);
@@ -474,7 +480,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 			String kerberosConfigFileName = dataSource.getHdfsHiveDetails().getKerberosConfigFileId();
 			String kerberosKeyTabFileName = dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId();
 
-			kerberosConfig = ApplicationUtilities.getKerberosConfigInfo(kerberosConfigFileName, kerberosKeyTabFileName);
+			kerberosConfig = applicationUtilities.getKerberosConfigInfo(kerberosConfigFileName, kerberosKeyTabFileName);
 
 			log.info("checkDataSourcesDetails, Received following Kerberos config info from ConfigFile : "
 					+ dataSource.getHdfsHiveDetails().getKerberosConfigFileId());
@@ -508,7 +514,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 					encryptionMap.put("KerberosConfigFileContents", kerberosConfig.getConfigFileContents());
 					
 					//enAssociation = Utilities.writeToCodeCloud(authorization, codeCloudAuthorization, dataSource.getDatasourceKey(), encryptionMap);
-					enAssociation = ApplicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
+					enAssociation = applicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
 					
 					dataSource.getHdfsHiveDetails().setKerberosLoginUser(enAssociation);
 			}
@@ -543,7 +549,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 					encryptionMap.put("DbServerUsername", dataSource.getDbDetails().getDbServerUsername());
 					encryptionMap.put("DbServerPassword", dataSource.getDbDetails().getDbServerPassword());
 					
-					enAssociation = ApplicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
+					enAssociation = applicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
 					
 					dataSource.getDbDetails().setDbServerUsername(enAssociation);
 					dataSource.getDbDetails().setDbServerPassword(enAssociation);
@@ -572,7 +578,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 					encryptionMap.put("DbServerUsername", dataSource.getDbDetails().getDbServerUsername());
 					encryptionMap.put("DbServerPassword", dataSource.getDbDetails().getDbServerPassword());
 
-					enAssociation = ApplicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
+					enAssociation = applicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
 					
 					dataSource.getDbDetails().setDbServerUsername(enAssociation);
 					dataSource.getDbDetails().setDbServerPassword(enAssociation);
@@ -599,7 +605,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 			String kerberosConfigFileName = dataSource.getHdfsHiveDetails().getKerberosConfigFileId();
 			String kerberosKeyTabFileName = dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId();
 
-			KerberosConfigInfo kerberosConfig = ApplicationUtilities.getKerberosConfigInfo(kerberosConfigFileName,
+			KerberosConfigInfo kerberosConfig = applicationUtilities.getKerberosConfigInfo(kerberosConfigFileName,
 					kerberosKeyTabFileName);
 
 			log.info("checkDataSourcesDetails, connection test for Spark on Yarn datasource will be initiated");
@@ -636,7 +642,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 					encryptionMap.put("KerberosKeyTabContent", kerberosConfig.getKerberosKeyTabContent());
 					encryptionMap.put("KerberosConfigFileContents", kerberosConfig.getConfigFileContents());
 					
-					enAssociation = ApplicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
+					enAssociation = applicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
 					
 					dataSource.getHdfsHiveDetails().setKerberosLoginUser(enAssociation);
 			}
@@ -659,7 +665,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 			String kerberosConfigFileName = dataSource.getHdfsHiveDetails().getKerberosConfigFileId();
 			String kerberosKeyTabFileName = dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId();
 
-			KerberosConfigInfo kerberosConfig = ApplicationUtilities.getKerberosConfigInfo(kerberosConfigFileName,
+			KerberosConfigInfo kerberosConfig = applicationUtilities.getKerberosConfigInfo(kerberosConfigFileName,
 					kerberosKeyTabFileName);
 
 			log.info("checkDataSourcesDetails, Received following Kerberos config info from ConfigFile : "
@@ -696,7 +702,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 					encryptionMap.put("KerberosKeyTabContent", kerberosConfig.getKerberosKeyTabContent());
 					encryptionMap.put("KerberosConfigFileContents", kerberosConfig.getConfigFileContents());
 					
-					enAssociation = ApplicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
+					enAssociation = applicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
 					
 					dataSource.getHdfsHiveDetails().setKerberosLoginUser(enAssociation);
 			}
@@ -724,7 +730,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 						encryptionMap.put("DbServerUsername", dataSource.getDbDetails().getDbServerUsername());
 						encryptionMap.put("DbServerPassword", dataSource.getDbDetails().getDbServerPassword());
 						
-						enAssociation = ApplicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
+						enAssociation = applicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
 						
 						dataSource.getFileDetails().setFileServerUserName(enAssociation);
 						dataSource.getFileDetails().setFileServerUserPassword(enAssociation);
@@ -751,7 +757,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 					encryptionMap.put("DbServerUsername", dataSource.getDbDetails().getDbServerUsername());
 					encryptionMap.put("DbServerPassword", dataSource.getDbDetails().getDbServerPassword());
 					
-					enAssociation = ApplicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
+					enAssociation = applicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
 					
 					dataSource.getDbDetails().setDbServerUsername(enAssociation);
 					dataSource.getDbDetails().setDbServerPassword(enAssociation);
@@ -775,7 +781,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 			String kerberosConfigFileName = dataSource.getHdfsHiveDetails().getKerberosConfigFileId();
 			String kerberosKeyTabFileName = dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId();
 
-			kerberosConfig = ApplicationUtilities.getKerberosConfigInfo(kerberosConfigFileName, kerberosKeyTabFileName);
+			kerberosConfig = applicationUtilities.getKerberosConfigInfo(kerberosConfigFileName, kerberosKeyTabFileName);
 
 			log.info("checkDataSourcesDetails, Received following Kerberos config info from ConfigFile : "
 					+ dataSource.getHdfsHiveDetails().getKerberosConfigFileId());
@@ -806,7 +812,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 					encryptionMap.put("KerberosKeyTabContent", kerberosConfig.getKerberosKeyTabContent());
 					encryptionMap.put("KerberosConfigFileContents", kerberosConfig.getConfigFileContents());
 					
-					enAssociation = ApplicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
+					enAssociation = applicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
 					
 					dataSource.getHdfsHiveDetails().setKerberosLoginUser(enAssociation);
 			}
@@ -826,7 +832,7 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 			String kerberosConfigFileName = dataSource.getHdfsHiveDetails().getKerberosConfigFileId();
 			String kerberosKeyTabFileName = dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId();
 
-			KerberosConfigInfo kerberosConfig = ApplicationUtilities.getKerberosConfigInfo(kerberosConfigFileName,
+			KerberosConfigInfo kerberosConfig = applicationUtilities.getKerberosConfigInfo(kerberosConfigFileName,
 					kerberosKeyTabFileName);
 
 			log.info("checkDataSourcesDetails, Received following Kerberos config info from ConfigFile : "
@@ -861,13 +867,13 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 					encryptionMap.put("KerberosKeyTabContent", kerberosConfig.getKerberosKeyTabContent());
 					encryptionMap.put("KerberosConfigFileContents", kerberosConfig.getConfigFileContents());
 					
-					enAssociation = ApplicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
+					enAssociation = applicationUtilities.writeToCodeCloudInMongo(user, dataSource.getDatasourceKey(), encryptionMap, mode);
 					
 					dataSource.getHdfsHiveDetails().setKerberosLoginUser(enAssociation);
 			}
 		} else {
 			// Invalid datasource category. Please verify the input parameters.
-			ApplicationUtilities.raiseConnectionFailedException(dataSource.getCategory());
+			applicationUtilities.raiseConnectionFailedException(dataSource.getCategory());
 		}
 
 		return connectionStatus;
@@ -1015,12 +1021,12 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 			}
 
 			// Make sure that file directory exists
-			if (Files.notExists(Paths.get(HelperTool.getEnv("kerberos_user_config_dir",
-					HelperTool.getComponentPropertyValue("kerberos_user_config_dir"))))) { // ./kerberos
+			if (Files.notExists(Paths.get(helperTool.getEnv("kerberos_user_config_dir",
+					helperTool.getComponentPropertyValue("kerberos_user_config_dir"))))) { // ./kerberos
 				StringBuilder sb = new StringBuilder();
 				sb.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
-						.append(HelperTool.getEnv("kerberos_user_config_dir",
-								HelperTool.getComponentPropertyValue("kerberos_user_config_dir")));
+						.append(helperTool.getEnv("kerberos_user_config_dir",
+								helperTool.getComponentPropertyValue("kerberos_user_config_dir")));
 				Files.createDirectories(Paths.get(sb.toString()));
 			}
 
@@ -1032,13 +1038,13 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 			for (int i = 0; i < bodyParts.length; i++) {
 					attachment = bodyParts[i];
 					attachmentfilename = bodyParts[i].getOriginalFilename();
-				fileNameKey = ApplicationUtilities.getKerberosFileName(user, attachmentfilename);
+				fileNameKey = applicationUtilities.getKerberosFileName(user, attachmentfilename);
 				if (attachmentfilename.endsWith(".conf")) { // Upload it as
 					// m09286.krb5.conf
 					StringBuilder sb = new StringBuilder();
 					sb.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
-							.append(HelperTool.getEnv("kerberos_user_config_dir",
-									HelperTool.getComponentPropertyValue("kerberos_user_config_dir")))
+							.append(helperTool.getEnv("kerberos_user_config_dir",
+									helperTool.getComponentPropertyValue("kerberos_user_config_dir")))
 							.append(System.getProperty("file.separator")).append(fileNameKey).append(".krb5.conf");
 
 						
@@ -1054,8 +1060,8 @@ public class DataSourceServiceV2Impl implements DataSourceServiceV2 {
 
 					StringBuilder sb = new StringBuilder();
 					sb.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
-							.append(HelperTool.getEnv("kerberos_user_config_dir",
-									HelperTool.getComponentPropertyValue("kerberos_user_config_dir")))
+							.append(helperTool.getEnv("kerberos_user_config_dir",
+									helperTool.getComponentPropertyValue("kerberos_user_config_dir")))
 							.append(System.getProperty("file.separator")).append(fileNameKey).append(".keytab");
 
 						java.nio.file.Path path = FileSystems.getDefault().getPath(sb.toString());

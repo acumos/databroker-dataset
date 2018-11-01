@@ -26,6 +26,7 @@ import java.net.URI;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -36,6 +37,7 @@ import org.acumos.datasource.common.DataSrcRestError;
 import org.acumos.datasource.common.ErrorListEnum;
 import org.acumos.datasource.common.FilterResults;
 import org.acumos.datasource.common.HelperTool;
+import org.acumos.datasource.common.JsonResponse;
 import org.acumos.datasource.common.ProxyManager;
 import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.schema.DataSourceMetadata;
@@ -43,19 +45,17 @@ import org.acumos.datasource.schema.DataSourceModel;
 import org.acumos.datasource.schema.DataSourceModelPost;
 import org.acumos.datasource.schema.DataSourceModelPut;
 import org.acumos.datasource.service.DataSourceServiceV2Impl;
-import org.acumos.datasource.utils.GlobalKeys;
 import org.acumos.datasource.utils.ApplicationUtilities;
+import org.acumos.datasource.utils.GlobalKeys;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpMediaTypeNotAcceptableException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -77,9 +77,6 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping(value = "/"+GlobalKeys.DATASOURCES)
 public class DatasourceController {
 
-	
-	
-
 	private static final Logger log= LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	
 	public static final String PROXY_HOST = "proxyHost";
@@ -97,7 +94,22 @@ public class DatasourceController {
 	
 	@Autowired
 	private HttpServletRequest request;
+	
+	@Autowired
+	HelperTool helperTool;
 
+	@Autowired
+	ApplicationUtilities applicationUtilities;
+	
+	private HttpHeaders getHeaders(Response rsp) {
+		MultivaluedMap<String, Object> mHeader = rsp.getHeaders();
+		HttpHeaders headers = new HttpHeaders();
+		for(String key: mHeader.keySet()) {
+			headers.add(key, mHeader.get(key).toString().replace("[", "").replace("]", ""));
+		}
+		
+		return headers;
+	}
 	
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = GlobalKeys.RESPOND_A_LIST_DATASOURCE_CONNECTION_DETAILS, 
@@ -109,7 +121,7 @@ public class DatasourceController {
 			@ApiResponse(code = 404, message = GlobalKeys.NOT_FOUND),
 			@ApiResponse(code = 500, message = GlobalKeys.INTERNAL_SERVER_ERROR) })
 	@ResponseBody
-	public Response getDataSourcesList(@RequestHeader("Authorization") String authorization,
+	public ResponseEntity<JsonResponse> getDataSourcesList(@RequestHeader("Authorization") String authorization,
 			@RequestParam(value=GlobalKeys.NAMESPACE2, required=false) String namespace,
 			@RequestParam(value=GlobalKeys.CATEGORY2, required=false) String category,
 			@RequestParam(value=GlobalKeys.TEXT_SEARCH, required=false) String textSearch,
@@ -125,10 +137,10 @@ public class DatasourceController {
 			log.info("getDataSourcesList, offset value being passed: " + pgOffset);
 			log.info("getDataSourcesList, limit value being passed: " + pgLimit);
 			
-			String url = HelperTool.getResourceURL(request);
+			String url = helperTool.getResourceURL(request);
 			
 			if(category != null) {
-				ApplicationUtilities.validateInputParameter("category", category, true);
+				applicationUtilities.validateInputParameter("category", category, true);
 			}
 			
 			//check for input values
@@ -140,7 +152,7 @@ public class DatasourceController {
 						Status.NOT_FOUND.getStatusCode(), err);
 			}
 
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("getDataSourcesList with user boolean as true, remote user detail: " + remoteUser);
 
 			results = service.getDataSourcesList(remoteUser, authorization, namespace, category, null, textSearch);
@@ -163,27 +175,28 @@ public class DatasourceController {
 						log.info("getDataSourcesList(), No. of datasources returning are: " + String.valueOf(results.size()));
 						
 						ResponseBuilder responseBuilder = Response.ok(results.toString());
-						return FilterResults.setPaginationRecord(pgOffset, pgLimit, totalRecords, url, responseBuilder);
+						Response rsp =  FilterResults.setPaginationRecord(pgOffset, pgLimit, totalRecords, url, responseBuilder);
+						return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 						
 					} else if (results.size() > 0 && (pgOffset*pgLimit) >=  totalRecords) {
 						
 						log.info("getDataSourcesList(), No. of datasources returning are: " + String.valueOf(results.size()));
-						
 						ResponseBuilder responseBuilder = Response.ok(results.toString());
-						return FilterResults.setPaginationRecord(pgOffset, pgLimit, totalRecords, url, responseBuilder);
+						Response rsp = FilterResults.setPaginationRecord(pgOffset, pgLimit, totalRecords, url, responseBuilder);
+						return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 						
 					} else {
 						
 						log.info("getDataSourcesList() requested range exceeds total number of datasources. Returning zero datasources.");
-						
 						StringBuilder sb = new StringBuilder();
 						sb.append(url).append("?page=").append(1).append("&perPage=").append(pgLimit);
-						
-						return Response.status(Status.OK.getStatusCode()).link(sb.toString(), "first").build();
+						Response rsp = Response.status(Status.OK.getStatusCode()).link(sb.toString(), "first").build();
+						return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 					}
 					
 				} else {
-					return Response.ok(results.toString()).build();
+					Response rsp =  Response.ok(results.toString()).build();
+					return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 				}
 				
 			} else if(pgOffset > 0 && pgLimit > 0) { //zero records for the given search, with pagination
@@ -192,22 +205,21 @@ public class DatasourceController {
 				StringBuilder sb = new StringBuilder();
 				sb.append(url).append("?page=").append(1).append("&perPage=").append(pgLimit);
 				
-				return Response.status(Status.OK.getStatusCode()).link(sb.toString(), "first").build();
+				Response rsp =  Response.status(Status.OK.getStatusCode()).link(sb.toString(), "first").build();
+				return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 
-			} else { //zero records for the given search
-				
-				return Response.ok("[]").build();
+			} else { //zero records for the given searce
+				return new ResponseEntity<JsonResponse>(new JsonResponse("[]") , HttpStatus.OK);
 			}
 			
 		} catch (DataSrcException cmlpException) {
-			
-			return cmlpException.toResponse();
-			
+			Response rsp =   cmlpException.toResponse();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 		} catch (Exception e) {
 			log.info("getDataSourcesList, Unknown Exception : " + e.getMessage());
 			DataSrcRestError err = DataSrcErrorList.buildError(e, null, CmlpApplicationEnum.DATASOURCE);
-			
-			return Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			Response rsp =  Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 		}
 	}
 	
@@ -223,7 +235,7 @@ public class DatasourceController {
 			@ApiResponse(code = 404, message = GlobalKeys.NOT_FOUND),
 			@ApiResponse(code = 500, message = GlobalKeys.INTERNAL_SERVER_ERROR) })
 	@ResponseBody
-	public Response getDataSource(@RequestHeader("Authorization") String authorization,
+	public ResponseEntity<JsonResponse> getDataSource(@RequestHeader("Authorization") String authorization,
 			@PathVariable (GlobalKeys.DATASOURCE_KEY) String dataSourceKey) {
 
 		String remoteUser;
@@ -231,7 +243,7 @@ public class DatasourceController {
 		try {
 			log.info("getDataSource, dataSourceKey value being passed: " + dataSourceKey);
 			
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("getDataSource with user boolean as true, remote user detail: " + remoteUser);
 
 			result = service.getDataSourcesList(remoteUser, authorization, null, null, dataSourceKey, null);
@@ -239,24 +251,26 @@ public class DatasourceController {
 					+ String.valueOf(result.size()));
 
 			if (result != null && result.size() > 0) {
-				return Response.ok(result.toString()).build();
+				Response rsp = Response.ok(result.toString()).build();
+				return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 
 			} else {
 				String[] variables = { "datasourceKey" };
-				
 				DataSrcRestError err = DataSrcErrorList.buildError(ErrorListEnum._0003, variables, null, CmlpApplicationEnum.DATASOURCE);
 				
 				throw new DataSrcException("No Datasource information available for the given datasourceKey/Search.",
 						Status.NOT_FOUND.getStatusCode(), err);
 			}
 		} catch (DataSrcException cmlpException) {
-			return cmlpException.toResponse();
+			Response rsp =  cmlpException.toResponse();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 
 		} catch (Exception e) {
 			log.info("getDataSource, Unknown Exception : " + e.getMessage());
 			DataSrcRestError err = DataSrcErrorList.buildError(e, null, CmlpApplicationEnum.DATASOURCE);
 			
-			return Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			Response rsp =  Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 		}
 	}
 
@@ -270,15 +284,14 @@ public class DatasourceController {
 			@ApiResponse(code = 404, message = GlobalKeys.NOT_FOUND),
 			@ApiResponse(code = 500, message = GlobalKeys.INTERNAL_SERVER_ERROR) })
 	@ResponseBody
-	public Response getDataSourceContents(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
+	public ResponseEntity<JsonResponse> getDataSourceContents(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
 			@PathVariable("datasourceKey") String datasourceKey,
 			@RequestParam(value=GlobalKeys.HDFS_FILENAME, required=false) String hdfsFilename, 
 			@RequestParam(value=PROXY_HOST, required=false) String proxyHost,
 			@RequestParam(value=PROXY_PORT, defaultValue = PROXY_PORT_DEFAULT) int proxyPort,
 			@RequestParam(value=PROXY_USER, required=false) String proxyUsername,
 			@RequestParam(value=PROXY_PASS, required=false) String proxyPassword) {
-
-		return Response.ok("").build();
+		return new ResponseEntity<JsonResponse>(new JsonResponse("[]") , HttpStatus.OK);
 	}
 	
 	
@@ -300,7 +313,7 @@ public class DatasourceController {
 		log.info("getMetadata_v2, dataSourceKey: " + dataSourceKey);
 		String remoteUser;
 		try {
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("Get datasource metadata, remote user detail: " + remoteUser);
 			String output = service.getMetadataContents(remoteUser, authorization, dataSourceKey);
 			
@@ -345,7 +358,7 @@ public class DatasourceController {
 			@ApiResponse(code = 500, message = GlobalKeys.INTERNAL_SERVER_ERROR,
 			response = DataSourceModel.class) })
 	@ResponseBody
-	public Response saveDataSourceDetail(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
+	public ResponseEntity<JsonResponse> saveDataSourceDetail(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
 			@RequestBody DataSourceModelPost dataSource,
 			@RequestParam(value=PROXY_HOST, required=false) String proxyHost,
 			@RequestParam(value=PROXY_PORT, defaultValue = PROXY_PORT_DEFAULT) int proxyPort,
@@ -354,12 +367,12 @@ public class DatasourceController {
 
 		String remoteUser;
 		try {
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("saveDataSourceDetail, remote user detail: " + remoteUser);
 			
-			String url = HelperTool.getResourceURL(request);
+			String url = helperTool.getResourceURL(request);
 			
-			String apiVersion = HelperTool.getAPIVersion(request); //initiating API version
+			String apiVersion = helperTool.getAPIVersion(request); //initiating API version
 			
 			log.info("saveDataSourceDetail, Request version : " + apiVersion);
 			
@@ -377,24 +390,25 @@ public class DatasourceController {
 				
 				URI location = new URI(url + "/" + datasourceKey);
 
-				return Response.created(location).entity(json.toString()).build();
+				Response rsp = Response.created(location).entity(json.toString()).build();
+				return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 
 			}  else {
-				
-				ApplicationUtilities.raiseConnectionFailedException(dataSource.getCategory());
-				
+				applicationUtilities.raiseConnectionFailedException(dataSource.getCategory());
 				//never reached this part of code as the above method will throw exception
 				throw new Exception("Datasource connection failed. Please check connection parameters.");
 			}
 				
 		} catch (DataSrcException cmlpException) {
-			return cmlpException.toResponse();
+			Response rsp = cmlpException.toResponse();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 
 		} catch (Exception e) {
 			log.info("saveDataSourceDetail, Unknown Exception : " + e.getMessage());
 			DataSrcRestError err = DataSrcErrorList.buildError(e, null, CmlpApplicationEnum.DATASOURCE);
 			
-			return Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			Response rsp = Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 		}
 	}
 	
@@ -409,7 +423,7 @@ public class DatasourceController {
 			@ApiResponse(code = 500, message = GlobalKeys.INTERNAL_SERVER_ERROR,
 			response = DataSourceModel.class) })
 	@ResponseBody
-	public Response updateDataSourceDetail(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
+	public ResponseEntity<JsonResponse> updateDataSourceDetail(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
 			@PathVariable(GlobalKeys.DATASOURCE_KEY) String dataSourceKey, 
 			@RequestBody DataSourceModelPut dataSource,
 			@RequestParam(value=PROXY_HOST, required=false) String proxyHost,
@@ -419,7 +433,7 @@ public class DatasourceController {
 		
 		String remoteUser;
 		try {
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("updateDataSourceDetail, remote user detail: " + remoteUser);
 			
 			ProxyManager.setUpProxy(proxyHost, proxyPort, proxyUsername, proxyPassword);
@@ -432,13 +446,14 @@ public class DatasourceController {
 			return getDataSource(authorization, dataSourceKey);
 			
 		} catch (DataSrcException cmlpException) {
-			return cmlpException.toResponse();
+			Response rsp =  cmlpException.toResponse();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 			
 		} catch (Exception e) {
 			log.info("updateDataSourceDetail, Unknown Exception : " + e.getMessage());
 			DataSrcRestError err = DataSrcErrorList.buildError(e, null, CmlpApplicationEnum.DATASOURCE);
-			
-			return Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			Response rsp =  Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 		}
 	}
 
@@ -452,13 +467,13 @@ public class DatasourceController {
 			@ApiResponse(code = 500, message = GlobalKeys.INTERNAL_SERVER_ERROR,
 			response = DataSourceModel.class) })
 	@ResponseBody
-	public Response deleteDataSourceDetail(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
+	public ResponseEntity<JsonResponse> deleteDataSourceDetail(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
 			@PathVariable(GlobalKeys.DATASOURCE_KEY) String dataSourceKey) {
 		
 		String remoteUser;
 		
 		try {
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("deleteDataSourceDetail, remote user detail: " + remoteUser);
 			boolean isDeleted = service.deleteDataSourceDetail(remoteUser, dataSourceKey);
 			log.info("deleteDataSourceDetail, the details for " + dataSourceKey
@@ -469,7 +484,8 @@ public class DatasourceController {
 
 				json.put("status", "Success - Datasource has been successfully deleted.");
 
-				return Response.status(Status.NO_CONTENT.getStatusCode()).entity(json.toString()).build();
+				Response rsp =   Response.status(Status.NO_CONTENT.getStatusCode()).entity(json.toString()).build();
+				return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 				
 			} else {
 				
@@ -477,13 +493,15 @@ public class DatasourceController {
 			}
 			
 		} catch (DataSrcException cmlpException) {
-			return cmlpException.toResponse();
+			Response rsp =   cmlpException.toResponse();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 			
 		} catch (Exception e) {
 			log.info("deleteDataSourceDetail, Unknown Exception : " + e.getMessage());
 			DataSrcRestError err = DataSrcErrorList.buildError(e, null, CmlpApplicationEnum.DATASOURCE);
 			
-			return Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			Response rsp =   Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(err).build();
+			return new ResponseEntity<JsonResponse>(new JsonResponse(rsp.getEntity().toString()) , getHeaders(rsp), HttpStatus.OK);
 		}
 	}
 	
@@ -498,10 +516,9 @@ public class DatasourceController {
 			@ApiResponse(code = 500, message = GlobalKeys.INTERNAL_SERVER_ERROR,
 			response = DataSourceModel.class) })
 	@ResponseBody
-	public Response validateDataSourceConnection(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
+	public ResponseEntity<JsonResponse> validateDataSourceConnection(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
 			@PathVariable(GlobalKeys.DATASOURCE_KEY) String datasourceKey) {
-
-		return Response.ok("").build();
+		 return new ResponseEntity<JsonResponse>(new JsonResponse("[]") , HttpStatus.OK);
 	}
 	
 	
@@ -520,14 +537,14 @@ public class DatasourceController {
 		String remoteUser;
 		
 		try {
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("getDataSourceSamples_v2, remote user detail: " + remoteUser);
 			InputStream in = service.getDataSourceSamples(remoteUser, authorization, datasourceKey,hdfsFilename);
 			
 			if(in != null) {
 				HttpHeaders headers = new HttpHeaders(); 
 				headers.setContentType(MediaType.TEXT_PLAIN); 
-				return new ResponseEntity<String>(ApplicationUtilities.getStringResponseFromInputStream(in), headers, HttpStatus.OK);
+				return new ResponseEntity<String>(applicationUtilities.getStringResponseFromInputStream(in), headers, HttpStatus.OK);
 				
 			} else {
 				log.info("getDataSourceSamples_v2, Received null response from service call");
@@ -539,7 +556,6 @@ public class DatasourceController {
 			}
 			
 		} catch (DataSrcException cmlpException) {
-
 			DataSrcRestError err = DataSrcErrorList.buildError(ErrorListEnum._1004, null, null, CmlpApplicationEnum.DATASOURCE);
 			HttpHeaders headers = new HttpHeaders(); 
 			headers.setContentType(MediaType.TEXT_PLAIN); 
@@ -555,14 +571,6 @@ public class DatasourceController {
 		}
 	}
 	
-/*	@ResponseBody
-	@ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
-	public String handleHttpMediaTypeNotAcceptableException() {
-	    return "acceptable MIME type:" + MediaType.TEXT_PLAIN_VALUE;
-	}*/
-
-
-	
 	@RequestMapping(value = "/{" + GlobalKeys.DATASOURCE_KEY + "}/prediction", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = GlobalKeys.RESPOND_WITH_STATUS_OF_TRANSACTION_TO_SAVE_PREDICTION_RESULT, notes = GlobalKeys.RETURNS_A_STATUS, response = String.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = GlobalKeys.CONNECTION_SUCCESS),
@@ -573,7 +581,7 @@ public class DatasourceController {
 			@ApiResponse(code = 500, message = GlobalKeys.UNEXPECTED_RUNTIME_ERROR,
 			response = DataSourceModel.class) })
 	@ResponseBody
-	public Response writebackPrediction(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
+	public ResponseEntity<JsonResponse> writebackPrediction(@RequestHeader(GlobalKeys.AUTHORIZATION2) String authorization,
 			@PathVariable(GlobalKeys.DATASOURCE_KEY) String datasourceKey, 
 			@RequestParam(value=GlobalKeys.HDFS_FILENAME) String hdfsFilename,
 			@RequestParam(value=GlobalKeys.INCLUDES_HEADER) String includesHeader,
@@ -583,6 +591,6 @@ public class DatasourceController {
 			@RequestParam(value=PROXY_USER, required=false) String proxyUsername,
 			@RequestParam(value=PROXY_PASS, required=false) String proxyPassword) {
 		
-		return Response.ok("").build();
+		return new ResponseEntity<JsonResponse>(new JsonResponse("[]") , HttpStatus.OK);
 	}
 }

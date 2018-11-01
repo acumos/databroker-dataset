@@ -22,6 +22,8 @@ package org.acumos.datasource.utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,8 +32,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -45,22 +45,6 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.lang.math.RandomUtils;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-
-import org.json.JSONObject;
-import org.apache.http.util.EntityUtils;
-
-import org.slf4j.LoggerFactory;
 import org.acumos.datasource.common.CMLPCipherSuite;
 import org.acumos.datasource.common.CmlpApplicationEnum;
 import org.acumos.datasource.common.DataSrcErrorList;
@@ -75,43 +59,67 @@ import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.model.KerberosLogin;
 import org.acumos.datasource.schema.DataSourceModelGet;
 import org.acumos.datasource.schema.NameValue;
+import org.apache.commons.lang.math.RandomUtils;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.BaseEncoding;
 import com.mongodb.DBObject;
 
+@Component
 public class ApplicationUtilities {
 
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	DbUtilitiesV2 dbUtilitiesV2;
+	
 	private static Logger log = LoggerFactory.getLogger(ApplicationUtilities.class);
 	
-	public static void createKerberosKeytab(KerberosLogin objKerberosLogin) throws IOException {
+	public void createKerberosKeytab(KerberosLogin objKerberosLogin) throws IOException {
 
 		if (objKerberosLogin.getKerberosKeyTabContent() != null) {
 			// writing keytab to a file
-			HelperTool.writeKeytab(objKerberosLogin.getKerberosLoginUser(),
+			helperTool.writeKeytab(objKerberosLogin.getKerberosLoginUser(),
 					objKerberosLogin.getKerberosKeyTabContent());
 			// writing kerberos details to a conf file
-			HelperTool.updateKrb5Conf(objKerberosLogin.getKerberosLoginUser(), objKerberosLogin.getKerberosRealms(),
+			helperTool.updateKrb5Conf(objKerberosLogin.getKerberosLoginUser(), objKerberosLogin.getKerberosRealms(),
 					objKerberosLogin.getKerberosKdc(), objKerberosLogin.getKerbersoAdminServer(),
 					objKerberosLogin.getKerberosPasswordServer(), objKerberosLogin.getKerberosDomainName());
 		}
 	}
 
-	public static void createKerberosKeytab(KerberosLogin objKerberosLogin, String kerberosKeyTabFileName,
+	public void createKerberosKeytab(KerberosLogin objKerberosLogin, String kerberosKeyTabFileName,
 			String kerberosConfigFileName) throws IOException {
 
 		if (objKerberosLogin.getKerberosKeyTabContent() != null) {
 			// writing keytab to a file
-			HelperTool.writeKeytab(objKerberosLogin.getKerberosLoginUser(), objKerberosLogin.getKerberosKeyTabContent(),
+			helperTool.writeKeytab(objKerberosLogin.getKerberosLoginUser(), objKerberosLogin.getKerberosKeyTabContent(),
 					kerberosKeyTabFileName);
 			// writing kerberos details to a conf file
-			HelperTool.updateKrb5Conf(objKerberosLogin.getKerberosLoginUser(), kerberosConfigFileName);
+			helperTool.updateKrb5Conf(objKerberosLogin.getKerberosLoginUser(), kerberosConfigFileName);
 		}
 	}
 
 	
-	public static String getName(String namespace, String category, String serverName, String user) {
+	public String getName(String namespace, String category, String serverName, String user) {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(category.replaceAll(" ", "_"))
@@ -128,14 +136,14 @@ public class ApplicationUtilities {
 	}
 
 	
-	public static String getEncrypt(String authorization, String value)
+	public String getEncrypt(String authorization, String value)
 			throws DataSrcException, IOException {
 
 		HttpClient client = HttpClients.createDefault();
 
 		// setting url on request
-		HttpPost request = new HttpPost(HelperTool.getEnv("configmgmt_encrypt_url",
-				HelperTool.getComponentPropertyValue("configmgmt_encrypt_url")));
+		HttpPost request = new HttpPost(helperTool.getEnv("configmgmt_encrypt_url",
+				helperTool.getComponentPropertyValue("configmgmt_encrypt_url")));
 		request.addHeader("Authorization", authorization);
 		request.addHeader("Content-Type", "text/plain");
 
@@ -180,17 +188,17 @@ public class ApplicationUtilities {
 	}
 
 	
-	public static Map<String, String> getDecrypt(String authorization, String datasourceKey)
+	public Map<String, String> getDecrypt(String authorization, String datasourceKey)
 			throws ClientProtocolException, IOException, DataSrcException {
 
 		// HttpClient client = new DefaultHttpClient();
 		HttpClient client = HttpClients.createDefault();
 
 		// setting url for decrypt operation
-		HttpGet request = new HttpGet(HelperTool.getEnv("configmgmt_decrypt_url_prefix",
-				HelperTool.getComponentPropertyValue("configmgmt_decrypt_url_prefix")) + datasourceKey
-				+ HelperTool.getEnv("configmgmt_decrypt_url_suffix",
-						HelperTool.getComponentPropertyValue("configmgmt_decrypt_url_suffix")));
+		HttpGet request = new HttpGet(helperTool.getEnv("configmgmt_decrypt_url_prefix",
+				helperTool.getComponentPropertyValue("configmgmt_decrypt_url_prefix")) + datasourceKey
+				+ helperTool.getEnv("configmgmt_decrypt_url_suffix",
+						helperTool.getComponentPropertyValue("configmgmt_decrypt_url_suffix")));
 		request.addHeader("Authorization", authorization);
 		request.addHeader("Content-Type", "text/plain");
 
@@ -244,7 +252,7 @@ public class ApplicationUtilities {
 	}
 
 	
-	public static String doEncryptDecryptCommit(String authorization, String codeCloudAuthorization,
+	public String doEncryptDecryptCommit(String authorization, String codeCloudAuthorization,
 			String datasourceKey, Map<String, String> writeValues, String mode)
 			throws IOException {
 
@@ -258,11 +266,11 @@ public class ApplicationUtilities {
 			isUpdate = true;
 
 		// generating file name based on datasourcekey provided
-		String filenamePrefix = HelperTool.getEnv("filename_prefix", HelperTool.getComponentPropertyValue("filename_prefix"));
+		String filenamePrefix = helperTool.getEnv("filename_prefix", helperTool.getComponentPropertyValue("filename_prefix"));
 		if(filenamePrefix == null)
 			filenamePrefix = "com_att_cmlp_config-";
 		
-		String filenameSuffix = HelperTool.getEnv("filename_suffix", HelperTool.getComponentPropertyValue("filename_suffix"));
+		String filenameSuffix = helperTool.getEnv("filename_suffix", helperTool.getComponentPropertyValue("filename_suffix"));
 		if(filenameSuffix == null)
 			filenameSuffix = ".properties";
 		
@@ -272,10 +280,10 @@ public class ApplicationUtilities {
 
 		// generating file based on teh filename generated above
 		File encryptionDir = new File(System.getProperty("user.dir") + System.getProperty("file.separator")
-				+ HelperTool.getEnv("filepath_string", HelperTool.getComponentPropertyValue("filepath_string")));
+				+ helperTool.getEnv("filepath_string", helperTool.getComponentPropertyValue("filepath_string")));
 		
 		File encryptionFile = new File(System.getProperty("user.dir") + System.getProperty("file.separator")
-				+ HelperTool.getEnv("filepath_string", HelperTool.getComponentPropertyValue("filepath_string"))
+				+ helperTool.getEnv("filepath_string", helperTool.getComponentPropertyValue("filepath_string"))
 				+ System.getProperty("file.separator") + fileName);
 
 		if (isCreate) {
@@ -308,7 +316,7 @@ public class ApplicationUtilities {
 
 			// delete the file stored in encrypted folder
 			log.info("Deleting the file from local folder... ");
-			ApplicationUtilities.deleteEncryptedFile(fileName);
+			deleteEncryptedFile(fileName);
 
 			return fileName;
 
@@ -319,7 +327,7 @@ public class ApplicationUtilities {
 	}
 
 	// Returns DatasourceModel from the given json string
-	public static DataSourceModelGet getDataSourceModel(String jsonStr) {
+	public DataSourceModelGet getDataSourceModel(String jsonStr) {
 		if (jsonStr == null)
 			return null;
 
@@ -340,7 +348,7 @@ public class ApplicationUtilities {
 	}
 
 	
-	public static String getKerberosFileName(String user, String origFileName) {
+	public String getKerberosFileName(String user, String origFileName) {
 
 		StringBuilder sb = new StringBuilder();
 		
@@ -352,7 +360,7 @@ public class ApplicationUtilities {
 	}
 
 	
-	public static String getOriginalFileName(String kerberosFileName) {
+	public String getOriginalFileName(String kerberosFileName) {
 
 		if (kerberosFileName.indexOf("_") > 0) {
 			kerberosFileName = kerberosFileName.substring(0, kerberosFileName.lastIndexOf("_"));
@@ -361,21 +369,21 @@ public class ApplicationUtilities {
 		return kerberosFileName;
 	}
 
-	public static KerberosConfigInfo getKerberosConfigInfo(String kerberosConfigFileName, String kerberosKeyTabFileName)
+	public KerberosConfigInfo getKerberosConfigInfo(String kerberosConfigFileName, String kerberosKeyTabFileName)
 			throws DataSrcException, IOException {
 
 		KerberosConfigInfo kerberosConfig = new KerberosConfigInfo();
 
 		StringBuilder sb1 = new StringBuilder();
 		sb1.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
-				.append(HelperTool.getEnv("kerberos_user_config_dir",
-						HelperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
+				.append(helperTool.getEnv("kerberos_user_config_dir",
+						helperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
 				.append(System.getProperty("file.separator")).append(kerberosConfigFileName);
 
 		StringBuilder sb2 = new StringBuilder();
 		sb2.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
-				.append(HelperTool.getEnv("kerberos_user_config_dir",
-						HelperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
+				.append(helperTool.getEnv("kerberos_user_config_dir",
+						helperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
 				.append(System.getProperty("file.separator")).append(kerberosKeyTabFileName);
 
 		if (Files.notExists(Paths.get(sb1.toString())) || Files.notExists(Paths.get(sb2.toString()))) {
@@ -557,7 +565,7 @@ public class ApplicationUtilities {
 			}
 
 			// Replace { } [ ] chars with Html encoded values
-			kerberosConfig.setConfigFileContents(ApplicationUtilities.htmlEncoding(sb.toString()));
+			kerberosConfig.setConfigFileContents(htmlEncoding(sb.toString()));
 
 			br.close();
 			fr.close();
@@ -585,19 +593,19 @@ public class ApplicationUtilities {
 	// registered datasource.
 	// These files information sent to codecloud to store in encrypted form.
 	// No use of these files to store in hard desk due to SPI information
-	public static void deleteUserKerberosConfigFiles(String kerberosConfigFileName, String kerberosKeyTabFileName) {
+	public void deleteUserKerberosConfigFiles(String kerberosConfigFileName, String kerberosKeyTabFileName) {
 
 		try {
 			StringBuilder sb1 = new StringBuilder();
 			sb1.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
-					.append(HelperTool.getEnv("kerberos_user_config_dir",
-							HelperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
+					.append(helperTool.getEnv("kerberos_user_config_dir",
+							helperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
 					.append(System.getProperty("file.separator")).append(kerberosConfigFileName);
 
 			StringBuilder sb2 = new StringBuilder();
 			sb2.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
-					.append(HelperTool.getEnv("kerberos_user_config_dir",
-							HelperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
+					.append(helperTool.getEnv("kerberos_user_config_dir",
+							helperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
 					.append(System.getProperty("file.separator")).append(kerberosKeyTabFileName);
 
 			Files.deleteIfExists(Paths.get(sb1.toString()));
@@ -610,7 +618,7 @@ public class ApplicationUtilities {
 	// delete kereberos config files used a cache to make kerberos connections.
 	// This method will be called only when there is a failure to restore the
 	// files during restoration from code cloud
-	public static void deleteUserKerberosCacheConfigFiles(String kerberosConfigFileName,
+	public void deleteUserKerberosCacheConfigFiles(String kerberosConfigFileName,
 			String kerberosKeyTabFileName) {
 
 		try {
@@ -631,7 +639,7 @@ public class ApplicationUtilities {
 
 	// This method will be called to check if the files exists before
 	// restoration from code cloud
-	public static boolean isUserKerberosCacheConfigFilesExists(String kerberosConfigFileName,
+	public boolean isUserKerberosCacheConfigFilesExists(String kerberosConfigFileName,
 			String kerberosKeyTabFileName) {
 		boolean isExists = false;
 		try {
@@ -658,13 +666,13 @@ public class ApplicationUtilities {
 	// delete encrypted files created after successfully stored the file in
 	// codecloud
 	// As these files are stored in codecloud, they are no longer needed
-	public static void deleteEncryptedFile(String fileName) {
+	public void deleteEncryptedFile(String fileName) {
 		try {
 			StringBuilder sb = new StringBuilder();
 
 			sb.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
-					.append(HelperTool.getEnv("filepath_string",
-							HelperTool.getComponentPropertyValue("filepath_string")))
+					.append(helperTool.getEnv("filepath_string",
+							helperTool.getComponentPropertyValue("filepath_string")))
 					.append(System.getProperty("file.separator")).append(fileName);
 
 			Files.deleteIfExists(Paths.get(sb.toString()));
@@ -675,7 +683,7 @@ public class ApplicationUtilities {
 	}
 
 	
-	public static String getName(String namespace) {
+	public String getName(String namespace) {
 
 		StringBuilder sb = new StringBuilder(namespace);
 		sb.append("_").append(String.valueOf(Instant.now().toEpochMilli())).append("_").append(getRandom()); // 40
@@ -690,7 +698,7 @@ public class ApplicationUtilities {
 	}
 
 
-	public static boolean writeToKerberosFile(String filename, String contents) {
+	public boolean writeToKerberosFile(String filename, String contents) {
 		boolean result = false;
 
 		// Modify contents which were encoded during encryption
@@ -698,14 +706,14 @@ public class ApplicationUtilities {
 		try {
 			StringBuilder sb = new StringBuilder();
 			sb.append(System.getProperty("user.dir")).append(System.getProperty("file.separator"))
-					.append(HelperTool.getEnv("kerberos_user_config_dir",
-							HelperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
+					.append(helperTool.getEnv("kerberos_user_config_dir",
+							helperTool.getComponentPropertyValue("kerberos_user_config_dir"))) // "./kerberos"
 					.append(System.getProperty("file.separator")).append(filename);
 
 			File kerberosFile = new File(sb.toString());
 
 			FileWriter fileWriter = new FileWriter(kerberosFile.getAbsoluteFile());
-			fileWriter.write(ApplicationUtilities.htmlDecoding(contents));
+			fileWriter.write(htmlDecoding(contents));
 
 			result = true;
 
@@ -718,7 +726,7 @@ public class ApplicationUtilities {
 		return result;
 	}
 
-	public static boolean writeToKerberosCacheFile(String filename, String contents) {
+	public boolean writeToKerberosCacheFile(String filename, String contents) {
 		boolean result = false;
 
 		// Modify contents which were encoded during encryption
@@ -732,7 +740,7 @@ public class ApplicationUtilities {
 			FileOutputStream fos = new FileOutputStream(kerberosFile.getAbsoluteFile());
 
 			if (filename.contains("krb5")) {
-				fos.write(ApplicationUtilities.htmlDecoding(contents).getBytes());
+				fos.write(htmlDecoding(contents).getBytes());
 			} else {
 				fos.write(contents.getBytes());
 			}
@@ -750,7 +758,7 @@ public class ApplicationUtilities {
 
 	// Method to decode certain encrypted values for GET operation
 	// The values should be extracted from the file in configuration management
-	public static ArrayList<String> decodeDataSourceDetails(ArrayList<String> lstDataSource, String authorization) {
+	public ArrayList<String> decodeDataSourceDetails(ArrayList<String> lstDataSource, String authorization) {
 		ArrayList<String> results = new ArrayList<String>();
 		String strDataSource = null;
 		boolean isDecoded = false;
@@ -766,7 +774,7 @@ public class ApplicationUtilities {
 
 			// convert mongodb string into datasource object
 			log.info("decodeDataSourceDetails(), Converting mongoDb Json string into DataSourceModel...");
-			DataSourceModelGet datasource = ApplicationUtilities.getDataSourceModel(strDataSource);
+			DataSourceModelGet datasource = getDataSourceModel(strDataSource);
 
 			if (datasource != null) {
 				log.info("decodeDataSourceDetails(), Category : " + datasource.getCategory());
@@ -778,14 +786,14 @@ public class ApplicationUtilities {
 					// Extract actual value from ConfigMgmt
 					log.info("decodeDataSourceDetails(), calling Decrypt to fetch encrypted values for datasourceKey : "
 							+ datasource.getDatasourceKey());
-					Map<String, String> decryptionMap = ApplicationUtilities.readFromCodeCloud(authorization,
+					Map<String, String> decryptionMap = readFromCodeCloud(authorization,
 							datasource.getDatasourceKey());
 
 					datasource.getHdfsHiveDetails().setKerberosLoginUser(decryptionMap.get("KerberosLoginUser".toLowerCase()));
 
 					log.info("decodeDataSourceDetails(), Setting kerberosLoginUser");
 
-					strDataSource = ApplicationUtilities.replaceValueInJson(strDataSource, "kerberosLoginUser",
+					strDataSource = replaceValueInJson(strDataSource, "kerberosLoginUser",
 							datasource.getHdfsHiveDetails().getKerberosLoginUser());
 
 					results.add(strDataSource);
@@ -807,7 +815,7 @@ public class ApplicationUtilities {
 	// The intention of this method is not to corrupt the complex input json
 	// string to replace a field value
 	// This method should be replaced with better way.
-	public static String replaceValueInJson(String inStr, String fieldName, String value) {
+	public String replaceValueInJson(String inStr, String fieldName, String value) {
 		try {
 			int index = 0;
 
@@ -833,26 +841,26 @@ public class ApplicationUtilities {
 		}
 	}
 
-	public static String htmlEncoding(String inStr) {
+	public String htmlEncoding(String inStr) {
 		String str = inStr.replaceAll("\\;", "&#59;").replaceAll("\\:", "&#58;").replaceAll("\\[", "&#91;")
 				.replaceAll("\\]", "&#93;").replaceAll("\\{", "&#123;").replaceAll("\\}", "&#125;");
 
 		return str;
 	}
 
-	public static String htmlDecoding(String inStr) {
+	public String htmlDecoding(String inStr) {
 		String str = inStr.replaceAll("&#123;", "{").replaceAll("&#125;", "}").replaceAll("&#91;", "[")
 				.replaceAll("&#93;", "]").replaceAll("&#58;", ":").replaceAll("&#59;", ";").replaceAll("@@@", "\n");
 		return str;
 	}
 
 	// any post processing clean up process
-	public static void postprocessCleanup(String inStr) {
+	public void postprocessCleanup(String inStr) {
 
 	}
 
 	
-	public static boolean validateConnectionParameters(DataSourceModelGet dataSource) throws DataSrcException {
+	public boolean validateConnectionParameters(DataSourceModelGet dataSource) throws DataSrcException {
 		boolean result = false;
 		
 		if (dataSource.getCategory().equals("hive")) {
@@ -1283,7 +1291,7 @@ public class ApplicationUtilities {
 	}
 	
 	
-	public static DataSourceModelGet validateInputRequest(DataSourceModelGet dataSource, String mode) throws DataSrcException {
+	public DataSourceModelGet validateInputRequest(DataSourceModelGet dataSource, String mode) throws DataSrcException {
 		//validate required fields
 		ArrayList<String> missedParameters = new ArrayList<String>();
 		if(dataSource.getOwnedBy() == null)
@@ -1451,7 +1459,7 @@ public class ApplicationUtilities {
 	}
 	
 	
-	public static void raiseConnectionFailedException(String category) throws DataSrcException {
+	public void raiseConnectionFailedException(String category) throws DataSrcException {
 		ArrayList<String> missedParameters = new ArrayList<String>();
 		
 		if("hive".equals(category)) {
@@ -1549,7 +1557,7 @@ public class ApplicationUtilities {
 	}
 	
 	
-	public static void validateInputParameter(String parameterName, String paramValue, boolean isQueryParam) throws DataSrcException, Exception {
+	public void validateInputParameter(String parameterName, String paramValue, boolean isQueryParam) throws DataSrcException, Exception {
 		
 		if("category".equals(parameterName)) {
 			
@@ -1573,7 +1581,7 @@ public class ApplicationUtilities {
 	}
 	
 	//Method to trim semicolon for hive query
-	public static String trimSemicolonAtEnd(String query) {
+	public String trimSemicolonAtEnd(String query) {
 		if(query == null)
 			return query;
 		
@@ -1586,7 +1594,7 @@ public class ApplicationUtilities {
 	}
 	
 	
-	public static String getResponseContentType(String datasourceKey) {
+	public String getResponseContentType(String datasourceKey) {
 		String contentType = "application/json";
 		try {
 			DbUtilitiesV2 dbUtilities = new DbUtilitiesV2();
@@ -1635,7 +1643,7 @@ public class ApplicationUtilities {
 		return contentType;
 	}
 	
-	public static InputStream getInputStream(FSDataInputStream response) {
+	public InputStream getInputStream(FSDataInputStream response) {
 	
 		try {
 			InputStream in = response.getWrappedStream();
@@ -1660,7 +1668,7 @@ public class ApplicationUtilities {
 	
 	
 	//write to code cloud through ConfigManagementServer instead of SpringConfigServer
-	public static String writeToCodeCloud1 (String authorization, String codeCloudAuthorization,
+	public String writeToCodeCloud1 (String authorization, String codeCloudAuthorization,
 			String datasourceKey, Map<String, String> writeValues)
 			throws DataSrcException, IOException {
 	
@@ -1675,15 +1683,15 @@ public class ApplicationUtilities {
 		}
 				
 		// generating file name based on datasourcekey provided
-		String fileName = HelperTool.getEnv("filename_prefix", "com_att_cmlp_config-")
+		String fileName = helperTool.getEnv("filename_prefix", "com_att_cmlp_config-")
 				+ datasourceKey
-				+ HelperTool.getEnv("filename_suffix", ".properties");
+				+ helperTool.getEnv("filename_suffix", ".properties");
 		
 		HttpPut request = null;
 		String responseStr = null;
 	
 		try {
-			String configMgrURL = HelperTool.getEnv("configmanagement_base_url", HelperTool.getComponentPropertyValue("configmanagement_base_url")) + fileName;
+			String configMgrURL = helperTool.getEnv("configmanagement_base_url", helperTool.getComponentPropertyValue("configmanagement_base_url")) + fileName;
 			
 			
 			try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -1743,7 +1751,7 @@ public class ApplicationUtilities {
 	
 	
 	//write to mongo db instead of code cloud
-	public static String writeToCodeCloudInMongo (String user,
+	public String writeToCodeCloudInMongo (String user,
 			String datasourceKey, Map<String, String> writeValues, String mode)
 			throws DataSrcException, IOException {
 	
@@ -1771,14 +1779,14 @@ public class ApplicationUtilities {
 	}
 	
 	//Read from code cloud through ConfigManagementServer instead of SpringConfigServer
-	public static Map<String, String> readFromCodeCloud (String authorization,
+	public Map<String, String> readFromCodeCloud (String authorization,
 			String datasourceKey)
 			throws IOException {
 		
 		// Fetch the file name based on datasourcekey provided
-		String fileName = HelperTool.getEnv("filename_prefix", HelperTool.getComponentPropertyValue("filename_prefix"))
+		String fileName = helperTool.getEnv("filename_prefix", helperTool.getComponentPropertyValue("filename_prefix"))
 				+ datasourceKey
-				+ HelperTool.getEnv("filename_suffix", HelperTool.getComponentPropertyValue("filename_suffix"));
+				+ helperTool.getEnv("filename_suffix", helperTool.getComponentPropertyValue("filename_suffix"));
 		
 		HttpGet request = null;
 		String responseStr = null;
@@ -1786,7 +1794,7 @@ public class ApplicationUtilities {
 		
 		try {
 			
-			String configMgrURL = HelperTool.getEnv("configmanagement_base_url", HelperTool.getComponentPropertyValue("configmanagement_base_url")) + fileName;
+			String configMgrURL = helperTool.getEnv("configmanagement_base_url", helperTool.getComponentPropertyValue("configmanagement_base_url")) + fileName;
 			
 			try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 				request = new HttpGet(configMgrURL);
@@ -1823,7 +1831,7 @@ public class ApplicationUtilities {
 				} else if (response.getStatusLine().getStatusCode() == 204 || response.getStatusLine().getStatusCode() == 404) {
 					//Not found and return an empty
 					log.info("getDecrypt(), No files found in codecloud through ConfigManagementServer. Trying to fetch through SpringConfigServer...");
-					decryptionMap = ApplicationUtilities.getDecrypt(authorization, datasourceKey);
+					decryptionMap = getDecrypt(authorization, datasourceKey);
 				} else {
 					log.info("getDecrypt(), Received Bad response from ConfigMgmt. Throwing exception...");
 					//Read message from ConfigMgmtServer response and build new exception
@@ -1849,18 +1857,15 @@ public class ApplicationUtilities {
 	}
 	
 	//read from mongo instead of code cloud
-	public static Map<String, String> readFromMongoCodeCloud (String user,
+	public Map<String, String> readFromMongoCodeCloud (String user,
 			String datasourceKey)
 			throws DataSrcException, IOException {
-		
-		DbUtilitiesV2 dbUtilities = new DbUtilitiesV2();
-		
-		return dbUtilities.getCredentialFromMongoCodeCloud(user, datasourceKey);
+		return dbUtilitiesV2.getCredentialFromMongoCodeCloud(user, datasourceKey);
 		
 		
 	}
 	
-	public static String getStringResponseFromInputStream(InputStream inStream) throws IOException {
+	public String getStringResponseFromInputStream(InputStream inStream) throws IOException {
 		BufferedReader rd = new BufferedReader(new InputStreamReader(inStream));
 		String line = "";
 		StringBuilder sb = new StringBuilder();

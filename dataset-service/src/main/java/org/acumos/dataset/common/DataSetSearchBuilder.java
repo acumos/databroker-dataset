@@ -33,11 +33,14 @@ import org.acumos.dataset.schema.DatasetAttributeMetaData;
 import org.acumos.dataset.schema.DatasetModelGet;
 import org.acumos.dataset.schema.DatasetTransformationInfo;
 import org.acumos.dataset.utils.ApplicationUtilities;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 
+@Component
 public class DataSetSearchBuilder {
 
 	private static final String OWNEDBY = "ownedBy";
@@ -61,11 +64,14 @@ public class DataSetSearchBuilder {
 	private static final String COLUMNINDEX = "columnIndex";
 	private static final String VALUE = "value";
 
+	@Autowired
+	ApplicationUtilities applicationUtilities;
+	
 	private DataSetSearchBuilder() {
 		super();
 	}
 
-	public static BasicDBObjectBuilder buildQueryForAdvancedSearch(String user, String datasetKey, DataSetSearchKeys searchKeys) {
+	public BasicDBObjectBuilder buildQueryForAdvancedSearch(String user, String datasetKey, DataSetSearchKeys searchKeys) {
 
 		BasicDBObjectBuilder query = BasicDBObjectBuilder.start();
 
@@ -91,13 +97,13 @@ public class DataSetSearchBuilder {
 		return query;
 	}
 
-	private static void setQueryObjectForNoOfAttributes(DataSetSearchKeys searchKeys, BasicDBObjectBuilder query) {
+	private void setQueryObjectForNoOfAttributes(DataSetSearchKeys searchKeys, BasicDBObjectBuilder query) {
 		if (searchKeys.getNoOfAttributes() != null) {
 			List<BasicDBObject> attributeRanges = new ArrayList<>();
 			int[] range;
 
 			for (String attributeRange : searchKeys.getNoOfAttributes()) { // 10-100
-				range = ApplicationUtilities.getRange(attributeRange);
+				range = applicationUtilities.getRange(attributeRange);
 
 				if (range[1] != 0) {
 					attributeRanges.add(
@@ -133,13 +139,13 @@ public class DataSetSearchBuilder {
 		}
 	}
 
-	private static void setQueryObjectForNoOfInstances(DataSetSearchKeys searchKeys, BasicDBObjectBuilder query) {
+	private void setQueryObjectForNoOfInstances(DataSetSearchKeys searchKeys, BasicDBObjectBuilder query) {
 		if (searchKeys.getNoOfInstances() != null) {
 			List<BasicDBObject> instanceRanges = new ArrayList<>();
 			int[] range;
 
 			for (String instanceRange : searchKeys.getNoOfInstances()) { // 10-100
-				range = ApplicationUtilities.getRange(instanceRange);
+				range = applicationUtilities.getRange(instanceRange);
 
 				if (range[1] != 0) {
 					instanceRanges.add(new BasicDBObject("noOfInstances",
@@ -215,7 +221,7 @@ public class DataSetSearchBuilder {
 		}
 	}
 
-	public static BasicDBObjectBuilder buildQueryForGet(String user, String datasetKey, String mode)
+	public BasicDBObjectBuilder buildQueryForGet(String user, String datasetKey, String mode)
 			throws DataSetException {
 
 		BasicDBObjectBuilder query = BasicDBObjectBuilder.start();
@@ -238,7 +244,7 @@ public class DataSetSearchBuilder {
 		return query;
 	}
 
-	public static DBObject createDBObject(DatasetModelGet dataSet) {
+	public DBObject createDBObject(DatasetModelGet dataSet) {
 		BasicDBObjectBuilder dataSetBuilder = BasicDBObjectBuilder.start();
 
 		buildDataSetBuilder(dataSet, dataSetBuilder);
@@ -272,7 +278,7 @@ public class DataSetSearchBuilder {
 
 	}
 
-	public static void buildDataSetBuilder(DatasetModelGet dataSet, BasicDBObjectBuilder dataSetBuilder) {
+	public void buildDataSetBuilder(DatasetModelGet dataSet, BasicDBObjectBuilder dataSetBuilder) {
 		dataSetBuilder.append("_id", dataSet.getDatasetKey());
 		dataSetBuilder.append(DATASETKEY, dataSet.getDatasetKey());
 
@@ -308,7 +314,7 @@ public class DataSetSearchBuilder {
 		}
 	}
 
-	public static void setAttributeMetaData(DatasetAttributeMetaData attributeMetaData,
+	public void setAttributeMetaData(DatasetAttributeMetaData attributeMetaData,
 			BasicDBObjectBuilder dataSetBuilder) {
 		if (attributeMetaData != null) {
 
@@ -330,7 +336,7 @@ public class DataSetSearchBuilder {
 		}
 	}
 
-	public static void setAttributeTransformationMetaData(DatasetAttributeMetaData attributeMetaData,
+	public void setAttributeTransformationMetaData(DatasetAttributeMetaData attributeMetaData,
 			BasicDBObject attributeMetadata) {
 
 		List<BasicDBObject> details = new ArrayList<>();
@@ -356,7 +362,7 @@ public class DataSetSearchBuilder {
 		attributeMetadata.append(TRANSFORMATION, details);
 	}
 
-	public static void setDatasetMetadata(DatasetModelGet dataSet, BasicDBObjectBuilder dataSetBuilder) {
+	public void setDatasetMetadata(DatasetModelGet dataSet, BasicDBObjectBuilder dataSetBuilder) {
 		if (dataSet.getDatasetMetaData() != null) {
 			BasicDBObject datasetMetadata = new BasicDBObject();
 			if (dataSet.getDatasetMetaData().getAttributeType() != null)
@@ -381,7 +387,7 @@ public class DataSetSearchBuilder {
 		}
 	}
 
-	public static DBObject updateDBObject(DatasetModelGet dataSet) {
+	public DBObject updateDBObject(DatasetModelGet dataSet) {
 		BasicDBObjectBuilder dataSetBuilder = BasicDBObjectBuilder.start();
 
 		buildDataSetBuilder(dataSet, dataSetBuilder);
@@ -417,12 +423,12 @@ public class DataSetSearchBuilder {
 
 	}
 
-	public static DBObject deleteDBObject(String datasetKey) {
+	public DBObject deleteDBObject(String datasetKey) {
 		BasicDBObjectBuilder dataSetBuilder = BasicDBObjectBuilder.start();
 
 		dataSetBuilder.append("_id", datasetKey);
 
-		if (ApplicationUtilities.isHardDeleteTurnedOn()) {
+		if (applicationUtilities.isHardDeleteTurnedOn()) {
 			dataSetBuilder.append(DATASETKEY, datasetKey);
 		} else {
 			dataSetBuilder.append(ISACTIVE, false);
@@ -431,7 +437,7 @@ public class DataSetSearchBuilder {
 		return dataSetBuilder.get();
 	}
 
-	public static BasicDBObjectBuilder checkForDatasetDatasource(String user, String datasetKey, String datasourceKey)
+	public BasicDBObjectBuilder checkForDatasetDatasource(String user, String datasetKey, String datasourceKey)
 			throws DataSetException {
 
 		BasicDBObjectBuilder query = BasicDBObjectBuilder.start();
@@ -444,7 +450,7 @@ public class DataSetSearchBuilder {
 		return query;
 	}
 
-	public static DBObject updateAttributeMetaData( String datasourceKey,
+	public DBObject updateAttributeMetaData( String datasourceKey,
 			DatasetAttributeMetaData attributeMetaData) {
 		BasicDBObjectBuilder dataSetBuilder = BasicDBObjectBuilder.start();
 

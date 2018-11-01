@@ -31,16 +31,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import org.slf4j.LoggerFactory;
 import org.acumos.datasource.common.CmlpApplicationEnum;
 import org.acumos.datasource.common.DataSrcErrorList;
 import org.acumos.datasource.common.DataSrcRestError;
@@ -52,6 +48,9 @@ import org.acumos.datasource.model.JdbcConnectionModel;
 import org.acumos.datasource.schema.DataSourceModelGet;
 import org.acumos.datasource.utils.ApplicationUtilities;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class JdbcDataSourceSvcImpl implements JdbcDataSourceSvc {
@@ -63,6 +62,12 @@ public class JdbcDataSourceSvcImpl implements JdbcDataSourceSvc {
 
 	@Autowired
 	private DbUtilitiesV2 dbUtilities;
+	
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
 
 	@Override
 	public String getConnectionStatus(JdbcConnectionModel objJdbcConnectionModel, String sqlStatement, String readWriteFlag)
@@ -127,7 +132,7 @@ public class JdbcDataSourceSvcImpl implements JdbcDataSourceSvc {
 							
 						} catch (SQLException e) {
 							log.error("Failed to execute insert", e);
-							ApplicationUtilities.raiseConnectionFailedException("jdbc");
+							applicationUtilities.raiseConnectionFailedException("jdbc");
 						}
 
 					} else {
@@ -145,7 +150,7 @@ public class JdbcDataSourceSvcImpl implements JdbcDataSourceSvc {
 			} 
 			
 			if(connectionStatus.equals("failed")) {
-				ApplicationUtilities.raiseConnectionFailedException("jdbc");
+				applicationUtilities.raiseConnectionFailedException("jdbc");
 			}
 			
 		} catch (DataSrcException e) {
@@ -196,9 +201,9 @@ public class JdbcDataSourceSvcImpl implements JdbcDataSourceSvc {
 					"Please provide a valid jdbc url", Status.BAD_REQUEST.getStatusCode(), err);
 		}
 		
-		log.info("Loading driver: " + HelperTool.getEnv(jdbc_driverName, HelperTool.getComponentPropertyValue(jdbc_driverName)));
+		log.info("Loading driver: " + helperTool.getEnv(jdbc_driverName, helperTool.getComponentPropertyValue(jdbc_driverName)));
 		
-		Class.forName(HelperTool.getEnv(jdbc_driverName, HelperTool.getComponentPropertyValue(jdbc_driverName)));
+		Class.forName(helperTool.getEnv(jdbc_driverName, helperTool.getComponentPropertyValue(jdbc_driverName)));
 		Connection connection = null;
 	
 		// preparing URL
@@ -212,8 +217,8 @@ public class JdbcDataSourceSvcImpl implements JdbcDataSourceSvc {
 			throws DataSrcException, IOException, SQLException, ClassNotFoundException {
 		
 		int rowsLimit; //default to 5
-		String strRowsLimit = HelperTool.getEnv("datasource_sample_size",
-				HelperTool.getComponentPropertyValue("datasource_sample_size"));
+		String strRowsLimit = helperTool.getEnv("datasource_sample_size",
+				helperTool.getComponentPropertyValue("datasource_sample_size"));
 		rowsLimit = strRowsLimit != null ? Integer.parseInt(strRowsLimit) : 5;
 
 		return (getResults( user, authorization, namespace, datasourceKey, rowsLimit));
@@ -226,7 +231,7 @@ public class JdbcDataSourceSvcImpl implements JdbcDataSourceSvc {
 
 		ArrayList<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false, authorization);
 		
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		if (dbDataSource.getReadWriteDescriptor().equalsIgnoreCase("write")){
 			String[] variables = {"readWriteDescriptor"};
 			DataSrcRestError err = DataSrcErrorList.buildError(ErrorListEnum._0003, variables, null, CmlpApplicationEnum.DATASOURCE);
@@ -238,7 +243,7 @@ public class JdbcDataSourceSvcImpl implements JdbcDataSourceSvc {
 		if (dbDataSource.getCategory().equals("jdbc") && dbDataSource.getOwnedBy().equals(user)) {
 			Map<String, String> decryptionMap = new HashMap<>();
 			
-			decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 			
 			StringBuilder resultString = new StringBuilder();
 			
@@ -321,8 +326,8 @@ public class JdbcDataSourceSvcImpl implements JdbcDataSourceSvc {
 		log.info("getJdbcDatasetSize()");
 
 		int MIN_SAMPLING_SIZE; //default to 50
-		String strMIN_SAMPLING_SIZE = HelperTool.getEnv("minimum_sampling_size",
-				HelperTool.getComponentPropertyValue("minimum_sampling_size"));
+		String strMIN_SAMPLING_SIZE = helperTool.getEnv("minimum_sampling_size",
+				helperTool.getComponentPropertyValue("minimum_sampling_size"));
 		MIN_SAMPLING_SIZE = strMIN_SAMPLING_SIZE != null ? Integer.parseInt(strMIN_SAMPLING_SIZE) : 50;
 		long size = 0;
 		
@@ -342,11 +347,11 @@ public class JdbcDataSourceSvcImpl implements JdbcDataSourceSvc {
 	@Override
 	public InputStream getSampleResults(DataSourceModelGet dataSource) throws IOException, ClassNotFoundException, SQLException, DataSrcException {
 		// checking not null for required parameter
-		ApplicationUtilities.validateConnectionParameters(dataSource);
+		applicationUtilities.validateConnectionParameters(dataSource);
 
 		int rowsLimit; //default to 5
-		String strRowsLimit = HelperTool.getEnv("datasource_sample_size",
-				HelperTool.getComponentPropertyValue("datasource_sample_size"));
+		String strRowsLimit = helperTool.getEnv("datasource_sample_size",
+				helperTool.getComponentPropertyValue("datasource_sample_size"));
 		rowsLimit = strRowsLimit != null ? Integer.parseInt(strRowsLimit) : 5;
 		
 		StringBuilder resultString = new StringBuilder();
@@ -373,7 +378,7 @@ public class JdbcDataSourceSvcImpl implements JdbcDataSourceSvc {
 
 		Map<String, String> decryptionMap = new HashMap<>();
 
-		decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, dataSource.getDatasourceKey());
+		decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, dataSource.getDatasourceKey());
 		
 		try {
 			//creating connection

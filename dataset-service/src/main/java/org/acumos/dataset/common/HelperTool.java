@@ -34,12 +34,16 @@ import javax.ws.rs.core.Response.Status;
 import org.acumos.dataset.exception.DataSetException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 /**
  * <p>
  * Helper class to maintain application level resources
  * </p>
  */
+@Component
 public class HelperTool {
 
 	private static Logger log = LoggerFactory.getLogger(HelperTool.class);
@@ -49,12 +53,15 @@ public class HelperTool {
 	private static final String MESSAGE = "getComponentPropertyValue(), trying to find value for property ";
 	private static final String REMOTEMESSAGE = "getRemoteUser(), trying to find remote user for request ";
 	
+	@Autowired
+	Environment env;
+	
 	private HelperTool() {
 		super();
 	}
 
 	
-	public static String getComponentPropertyValue(String key) throws IOException {
+	public String getComponentPropertyValue(String key) throws IOException {
 		log.info(MESSAGE + key);
 		Properties prop = new Properties();
 		InputStream input;
@@ -74,7 +81,7 @@ public class HelperTool {
 	}
 
 	
-	public static String getRemoteUser(HttpServletRequest request) throws DataSetException {
+	public String getRemoteUser(HttpServletRequest request) throws DataSetException {
 		log.info(REMOTEMESSAGE + request.getRequestedSessionId());
 		if (request.getRemoteUser() != null) {
 			log.info(REMOTEMESSAGE + request.getRequestedSessionId() + " as "
@@ -111,8 +118,16 @@ public class HelperTool {
 	}
 
 	
-	public static String getEnv(String envKey, String defaultValue) {
-		String value = System.getenv(envKey);
+	public String getEnv(String envKey, String defaultValue) {
+		
+		String value = null;
+		
+		value = env.getProperty(envKey);
+		
+		if(value == null) {
+			value = System.getenv(envKey);
+		}
+		
 		log.info("getEnv(), environment variable value for envkey " + envKey + "has been searched.");
 		if (value == null) {
 			log.info("getEnv(), setting value to environment variable value for envkey: " + envKey);
@@ -125,7 +140,7 @@ public class HelperTool {
 		return value;
 	}
 
-	public static String getAPIVersion(HttpServletRequest request) {
+	public String getAPIVersion(HttpServletRequest request) {
 		if (apiVersion == null) {
 			String requestURI = request.getRequestURI();
 			String cntxtPath = request.getContextPath();
@@ -135,18 +150,18 @@ public class HelperTool {
 		return apiVersion;
 	}
 
-	public static String getAPIVersion() {
+	public String getAPIVersion() {
 		return apiVersion;
 	}
 
-	public static String getResourceURL(HttpServletRequest request) {
+	public String getResourceURL(HttpServletRequest request) {
 		try {
 			if (resourceURL == null) {
 				String requestURL = request.getRequestURL().toString();
 				String requestURI = request.getRequestURI().toString();
 
 				String baseURL = requestURL.substring(0, requestURL.indexOf(requestURI));
-				String ingressPath = HelperTool.getEnv("ingress_service_path", HelperTool.getComponentPropertyValue("ingress_service_path"));
+				String ingressPath = getEnv("ingress_service_path", getComponentPropertyValue("ingress_service_path"));
 
 				StringBuilder sb = new StringBuilder();
 				sb.append(baseURL).append("/").append(ingressPath).append(requestURI);

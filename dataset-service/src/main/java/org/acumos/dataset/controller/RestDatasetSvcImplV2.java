@@ -61,6 +61,13 @@ public class RestDatasetSvcImplV2 implements RestDatasetSvcV2 {
 
 	@Autowired
 	HttpServletRequest request;
+	
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
+
 
 	@Override
 	public Response getDataSetListV2(String authorization, String textSearch, DataSetSearchKeys dataSearchKeys,
@@ -80,9 +87,9 @@ public class RestDatasetSvcImplV2 implements RestDatasetSvcV2 {
 						Status.NOT_FOUND.getStatusCode(), err);
 			}
 
-			String url = HelperTool.getResourceURL(request);
+			String url = helperTool.getResourceURL(request);
 
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("getdatasetsList with user boolean as true, remote user detail: " + remoteUser);
 
 			String datasetKey = null;
@@ -164,7 +171,7 @@ public class RestDatasetSvcImplV2 implements RestDatasetSvcV2 {
 		try {
 			log.info("getdatasetsList, datasetKey value being passed: " + datasetKey);
 
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("getdatasetsList with user boolean as true, remote user detail: " + remoteUser);
 
 			results = service.getDataSetDetails(remoteUser, datasetKey, null, null);
@@ -199,11 +206,11 @@ public class RestDatasetSvcImplV2 implements RestDatasetSvcV2 {
 	public Response saveDataSetDetailV2(String authorization, DatasetModelPost dataSet) {
 		String remoteUser;
 		try {
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 
-			String url = HelperTool.getResourceURL(request);
+			String url = helperTool.getResourceURL(request);
 
-			String apiVersion = HelperTool.getAPIVersion(request); // initiating API version
+			String apiVersion = helperTool.getAPIVersion(request); // initiating API version
 
 			log.info("savedatasetDetail_v2, Request version : " + apiVersion);
 
@@ -234,19 +241,19 @@ public class RestDatasetSvcImplV2 implements RestDatasetSvcV2 {
 	public Response updateDataSetDetailV2(String authorization, String datasetKey, DatasetModelPut dataset) {
 		String remoteUser;
 		try {
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("updatedatasetDetail, remote user detail: " + remoteUser);
 
 			if (dataset.getDatasourceKey() != null) {
 				StringBuilder datasourceURL = new StringBuilder(); // init it
-				datasourceURL.append(HelperTool.getEnv("datasource_ms_base_url",
-						HelperTool.getComponentPropertyValue("datasource_ms_base_url")));
+				datasourceURL.append(helperTool.getEnv("datasource_ms_base_url",
+						helperTool.getComponentPropertyValue("datasource_ms_base_url")));
 				StringBuilder datasourceSampleURL = new StringBuilder();
-				datasourceSampleURL.append("/datasourceKey/" + HelperTool.getEnv(DATASOURCESAMPLECONTENT,
-						HelperTool.getComponentPropertyValue(DATASOURCESAMPLECONTENT)));
+				datasourceSampleURL.append("/datasourceKey/" + helperTool.getEnv(DATASOURCESAMPLECONTENT,
+						helperTool.getComponentPropertyValue(DATASOURCESAMPLECONTENT)));
 				StringBuilder datasourceContentsUrl = new StringBuilder();
-				datasourceContentsUrl.append(HelperTool.getEnv(DATASOURCESAMPLECONTENT,
-						HelperTool.getComponentPropertyValue(DATASOURCESAMPLECONTENT)) + "/datasourceKey");
+				datasourceContentsUrl.append(helperTool.getEnv(DATASOURCESAMPLECONTENT,
+						helperTool.getComponentPropertyValue(DATASOURCESAMPLECONTENT)) + "/datasourceKey");
 				datasourceURL.append(request.getRequestURI());
 
 			}
@@ -271,7 +278,7 @@ public class RestDatasetSvcImplV2 implements RestDatasetSvcV2 {
 	public Response deleteDataSetDetailV2(String authorization, String datasetKey) {
 		String remoteUser;
 		try {
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("deletedatasetDetail, remote user detail: " + remoteUser);
 			boolean isDeleted = service.deleteDataSetDetail(remoteUser, datasetKey);
 			log.info("deletedatasetDetail, the details for " + datasetKey
@@ -280,7 +287,7 @@ public class RestDatasetSvcImplV2 implements RestDatasetSvcV2 {
 			if (isDeleted) {
 				JSONObject json = new JSONObject();
 
-				if (ApplicationUtilities.isHardDeleteTurnedOn())
+				if (applicationUtilities.isHardDeleteTurnedOn())
 					json.put("status", "Success - Dataset has been permanently deleted.");
 				else
 					json.put("status", "Success - Dataset has been successfully deleted.");
@@ -304,7 +311,7 @@ public class RestDatasetSvcImplV2 implements RestDatasetSvcV2 {
 	public Response getDataSourcesV2(String authorization, String dataSetKey) {
 		String remoteUser;
 		try {
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("getDataSources, remote user detail: " + remoteUser);
 			String datasourceKey = service.getDataSources(authorization, remoteUser, dataSetKey);
 			log.info("getDataSources, the data source for " + dataSetKey + " are returning... ");
@@ -328,7 +335,7 @@ public class RestDatasetSvcImplV2 implements RestDatasetSvcV2 {
 	public Response updateDataSourceKeyV2(String authorization, String dataSetKey, DatasetDatasourceInfo dataSource) {
 		String remoteUser;
 		try {
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("updateDataSourceKey, remote user detail: " + remoteUser);
 			boolean update = service.updateDataSourceKey(authorization, remoteUser, dataSetKey,
 					dataSource.getDatasourceKey());
@@ -366,7 +373,7 @@ public class RestDatasetSvcImplV2 implements RestDatasetSvcV2 {
 		try {
 			log.info("getAttributeMetaData, datasetKey value being passed: " + datasetKey);
 
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("getAttributeMetaData with user boolean as true, remote user detail: " + remoteUser);
 
 			results = service.getDataSetDetails(remoteUser, datasetKey, null, null);
@@ -425,7 +432,7 @@ public class RestDatasetSvcImplV2 implements RestDatasetSvcV2 {
 			DatasetAttributeMetaData attributeMetaData) {
 		String remoteUser;
 		try {
-			remoteUser = HelperTool.getRemoteUser(request);
+			remoteUser = helperTool.getRemoteUser(request);
 			log.info("updateAttributeMetaData, remote user detail: " + remoteUser);
 
 			boolean update = service.updateAttributeMetaData(authorization, remoteUser, datasetKey, attributeMetaData);

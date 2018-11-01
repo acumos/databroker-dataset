@@ -22,19 +22,26 @@ package org.acumos.datasource.service;
 
 import java.io.IOException;
 
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.springframework.stereotype.Service;
-
-import org.slf4j.LoggerFactory;
 import org.acumos.datasource.common.HelperTool;
 import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.model.SparkSAModel;
+import org.acumos.datasource.utils.ApplicationUtilities;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class SparkStandaloneSvcImpl implements SparkStandaloneSvc {
 
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
+	
 	private static Logger log = LoggerFactory.getLogger(SparkStandaloneSvcImpl.class);
 
 	public SparkStandaloneSvcImpl() {
@@ -45,18 +52,18 @@ public class SparkStandaloneSvcImpl implements SparkStandaloneSvc {
 		SparkConf sparkConf = new SparkConf();
 		sparkConf.setMaster("spark://" + sparkHostName + ":" + port).setAppName("sprkTest")
 				.set("spark.submit.deployMode",
-						HelperTool.getEnv("spark_deploy_mode",
-								HelperTool.getComponentPropertyValue("spark_deploy_mode")))
+						helperTool.getEnv("spark_deploy_mode",
+								helperTool.getComponentPropertyValue("spark_deploy_mode")))
 				.set("spark.driver.memory",
-						HelperTool.getEnv("spark_driver_memory",
-								HelperTool.getComponentPropertyValue("spark_driver_memory")))
+						helperTool.getEnv("spark_driver_memory",
+								helperTool.getComponentPropertyValue("spark_driver_memory")))
 				.set("spark.executor.memory",
-						HelperTool.getEnv("spark_executor_memory",
-								HelperTool.getComponentPropertyValue("spark_executor_memory")))
+						helperTool.getEnv("spark_executor_memory",
+								helperTool.getComponentPropertyValue("spark_executor_memory")))
 				.setSparkHome(System.getProperty("user.dir") + System.getProperty("file.separator")
 						+ "spark-2.1.1-bin-hadoop2.6")
-				.setJars(new String[] { HelperTool.getEnv("spark_test_jar_http",
-						HelperTool.getComponentPropertyValue("spark_test_jar_http")) });
+				.setJars(new String[] { helperTool.getEnv("spark_test_jar_http",
+						helperTool.getComponentPropertyValue("spark_test_jar_http")) });
 
 		JavaSparkContext jsc = new JavaSparkContext(sparkConf);
 		
@@ -88,8 +95,8 @@ public class SparkStandaloneSvcImpl implements SparkStandaloneSvc {
 			SparkConf sparkConf = new SparkConf();
 			sparkConf.setMaster("spark://" + sparkObject.getSparkHostName() + ":" + sparkObject.getPort()).setAppName(sparkObject.getSparkAppName())
 					.set("spark.submit.deployMode",
-							HelperTool.getEnv("spark_deploy_mode",
-									HelperTool.getComponentPropertyValue("spark_deploy_mode")))
+							helperTool.getEnv("spark_deploy_mode",
+									helperTool.getComponentPropertyValue("spark_deploy_mode")))
 					.set("spark.driver.memory",
 							sparkObject.getSparkDriverMemory())
 					.set("spark.executor.memory",

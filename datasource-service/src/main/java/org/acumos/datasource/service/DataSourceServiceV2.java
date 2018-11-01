@@ -20,10 +20,10 @@
 
 package org.acumos.datasource.service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
-import java.io.IOException;
 
 import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.schema.DataSourceModelGet;

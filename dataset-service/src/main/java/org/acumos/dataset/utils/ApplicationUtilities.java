@@ -55,20 +55,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class ApplicationUtilities {
 	private static Logger log = LoggerFactory.getLogger(ApplicationUtilities.class);
 	private static final String DATASOURCEURL = "datasource_ms_base_url_v2";
 	private static final String DATASUFFIX = "datasource_details_fetch_suffix_v2";
 	private static final String DATASETNAME = "datasetName";
 
+	@Autowired
+	HelperTool helperTool;
+	
 	private ApplicationUtilities() {
 		super();
 	}
 
 	
-	public static String getName(String user) {
+	public String getName(String user) {
 
 		StringBuilder sb = new StringBuilder((user.indexOf('@') != -1) ? user.substring(0, user.indexOf('@')) : user);
 		sb.append("_").append(String.valueOf(Instant.now().toEpochMilli())).append("_").append(getRandom());
@@ -79,15 +84,15 @@ public class ApplicationUtilities {
 	/**
 	 * Execute request to get datasource details from datasource mS
 	 */
-	public static InputStream getDataSource(String authorization, String datasourceKey) throws DataSetException {
+	public InputStream getDataSource(String authorization, String datasourceKey) throws DataSetException {
 
 		HttpGet request = null;
 		InputStream inStream = null;
 
 		try {
-			String datasourceURL = HelperTool.getEnv(DATASOURCEURL,
-					HelperTool.getComponentPropertyValue(DATASOURCEURL));
-			String datasourceURI = HelperTool.getEnv(DATASUFFIX, HelperTool.getComponentPropertyValue(DATASUFFIX));
+			String datasourceURL = helperTool.getEnv(DATASOURCEURL,
+					helperTool.getComponentPropertyValue(DATASOURCEURL));
+			String datasourceURI = helperTool.getEnv(DATASUFFIX, helperTool.getComponentPropertyValue(DATASUFFIX));
 
 			datasourceURI = getDatasourceURI(datasourceURI, datasourceKey);
 
@@ -219,7 +224,7 @@ public class ApplicationUtilities {
 		}
 	}
 
-	public static void validateDatasetModel(DatasetModelGet dataset, DbUtilities_v2 dbUtilities, String mode)
+	public void validateDatasetModel(DatasetModelGet dataset, DbUtilities_v2 dbUtilities, String mode)
 			throws DataSetException, IOException, JSONException {
 
 		findMissedParameters(dataset);
@@ -254,7 +259,7 @@ public class ApplicationUtilities {
 					dataset.getNamespace());
 
 			for (String dbRecord : dbRecords) {
-				String dbId = ApplicationUtilities.getFieldValueFromJsonString(dbRecord, "_id");
+				String dbId = getFieldValueFromJsonString(dbRecord, "_id");
 				if (!dataset.getDatasetKey().equals(dbId)) {
 					log.error("DatasetModel has duplicate datasetName/namespace/env. throwing excpetion..." + dbRecord);
 					String[] variables = { DATASETNAME, "namespace" };
@@ -275,7 +280,7 @@ public class ApplicationUtilities {
 		return String.valueOf(RandomUtils.nextLong());
 	}
 
-	public static String getFieldValueFromJsonString(String jsonStr, String fieldName) throws JSONException {
+	public String getFieldValueFromJsonString(String jsonStr, String fieldName) throws JSONException {
 		JSONObject jsonObj = new JSONObject(jsonStr);
 		if (jsonObj.has(fieldName))
 			return jsonObj.getString(fieldName);
@@ -283,7 +288,7 @@ public class ApplicationUtilities {
 			return null;
 	}
 
-	public static int[] getRange(String inputStr) {
+	public int[] getRange(String inputStr) {
 		int[] range = { 0, 0 };
 		try {
 			StringTokenizer st = new StringTokenizer(inputStr, "-"); // inputStr = 10-100
@@ -295,11 +300,11 @@ public class ApplicationUtilities {
 		return range;
 	}
 
-	public static boolean isHardDeleteTurnedOn() {
+	public boolean isHardDeleteTurnedOn() {
 		boolean isHardDelete = false;
 		try {
-			String configValue = HelperTool.getEnv("dataset_hard_delete",
-					HelperTool.getComponentPropertyValue("dataset_hard_delete"));
+			String configValue = helperTool.getEnv("dataset_hard_delete",
+					helperTool.getComponentPropertyValue("dataset_hard_delete"));
 			if (configValue != null && configValue.equalsIgnoreCase("true"))
 				isHardDelete = true;
 		} catch (Exception e) {
@@ -308,7 +313,7 @@ public class ApplicationUtilities {
 		return isHardDelete;
 	}
 
-	public static boolean getBooleanFieldValueFromJsonString(String jsonStr, String fieldName) throws JSONException {
+	public boolean getBooleanFieldValueFromJsonString(String jsonStr, String fieldName) throws JSONException {
 		JSONObject jsonObj = new JSONObject(jsonStr);
 		boolean result = false;
 		if (jsonObj.has(fieldName))
@@ -316,7 +321,7 @@ public class ApplicationUtilities {
 		return result;
 	}
 
-	public static String getDatasourceURI(String datasourceURI, String datasourceKey) {
+	public String getDatasourceURI(String datasourceURI, String datasourceKey) {
 		if (datasourceURI != null) {
 			datasourceURI = datasourceURI.trim();
 
@@ -370,7 +375,7 @@ public class ApplicationUtilities {
 		}
 	}
 
-	public static String getDatasourceResponseFromInputStream(InputStream inStream) throws IOException {
+	public String getDatasourceResponseFromInputStream(InputStream inStream) throws IOException {
 		BufferedReader rd = new BufferedReader(new InputStreamReader(inStream));
 		String line = "";
 		StringBuilder sb = new StringBuilder();
@@ -396,14 +401,14 @@ public class ApplicationUtilities {
 		return isValid;
 	}
 
-	public static void executeWriteback(String authorization, String datasourceKey, FormBodyPart dataFile)
+	public void executeWriteback(String authorization, String datasourceKey, FormBodyPart dataFile)
 			throws DataSetException, ParseException, IOException {
 
 		HttpPost request = null;
 
 		try {
 			
-			String baseURL = HelperTool.getEnv(DATASOURCEURL, HelperTool.getComponentPropertyValue(DATASOURCEURL));
+			String baseURL = helperTool.getEnv(DATASOURCEURL, helperTool.getComponentPropertyValue(DATASOURCEURL));
 			StringBuilder urlBuffer = new StringBuilder();
 			urlBuffer.append(baseURL).append("/").append(datasourceKey).append("/prediction");
 
