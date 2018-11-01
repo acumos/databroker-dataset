@@ -42,26 +42,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
 import javax.net.ssl.HttpsURLConnection;
+import javax.ws.rs.core.Response.Status;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import org.slf4j.LoggerFactory;
-import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.common.CmlpApplicationEnum;
 import org.acumos.datasource.common.DataSrcErrorList;
 import org.acumos.datasource.common.DataSrcRestError;
 import org.acumos.datasource.common.ErrorListEnum;
 import org.acumos.datasource.common.HelperTool;
 import org.acumos.datasource.connection.DbUtilitiesV2;
+import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.model.FileConnectionModel;
-import org.acumos.datasource.schema.DataSourceModelGet;
 import org.acumos.datasource.schema.DataSourceMetadata;
+import org.acumos.datasource.schema.DataSourceModelGet;
 import org.acumos.datasource.schema.NameValue;
 import org.acumos.datasource.utils.ApplicationUtilities;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class FileDataSourceSvcImpl implements FileDataSourceSvc {
@@ -73,6 +72,12 @@ public class FileDataSourceSvcImpl implements FileDataSourceSvc {
 
 	@Autowired
 	private DbUtilitiesV2 dbUtilities;
+	
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
 
 	@Override
 	public URLConnection getURLConnection(String fileURL, String username, String password)
@@ -103,16 +108,19 @@ public class FileDataSourceSvcImpl implements FileDataSourceSvc {
 		}
 		
 		//set the proxy
-		String proxyHost = HelperTool.getEnv("proxy_host",
-				HelperTool.getComponentPropertyValue("proxy_host"));
+		String proxyHost = helperTool.getEnv("proxy_host", helperTool.getComponentPropertyValue("proxy_host"));
 		
-		int proxyPort = Integer.parseInt(HelperTool.getEnv("proxy_port",
-				HelperTool.getComponentPropertyValue("proxy_port")));
+		if(proxyHost != null) {
+		int proxyPort = Integer.parseInt(helperTool.getEnv("proxy_port", helperTool.getComponentPropertyValue("proxy_port")));
 		
-		SocketAddress addr = new InetSocketAddress(proxyHost, proxyPort);
-		Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
-		urlConn = url.openConnection(proxy);
-
+			SocketAddress addr = new InetSocketAddress(proxyHost, proxyPort);
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
+			urlConn = url.openConnection(proxy);
+		}
+		else {
+			urlConn = url.openConnection();
+		}
+		
 		if (authStrEnc != null) {
 			urlConn.setRequestProperty("Authorization", "Basic " + authStrEnc);
        }
@@ -190,7 +198,7 @@ public class FileDataSourceSvcImpl implements FileDataSourceSvc {
 				connectionStatus = "success";
 			}
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 		}		    
 		 return connectionStatus;
 	}
@@ -214,8 +222,8 @@ public class FileDataSourceSvcImpl implements FileDataSourceSvc {
 		String line;
 		StringBuilder resultString = new StringBuilder();
 		int rows=0, rowsLimit; 
-		String strRowsLimit = HelperTool.getEnv("datasource_sample_size",
-				HelperTool.getComponentPropertyValue("datasource_sample_size"));
+		String strRowsLimit = helperTool.getEnv("datasource_sample_size",
+				helperTool.getComponentPropertyValue("datasource_sample_size"));
 		rowsLimit = strRowsLimit != null ? Integer.parseInt(strRowsLimit) : 5;
 		
 		while ((line = br.readLine()) != null && rows++<rowsLimit) {
@@ -232,7 +240,7 @@ public class FileDataSourceSvcImpl implements FileDataSourceSvc {
 		
 		List<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false, authorization);
 		
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		
 		if (dbDataSource.getCategory().equals("file") && dbDataSource.getOwnedBy().equals(user)) {
 
@@ -240,7 +248,7 @@ public class FileDataSourceSvcImpl implements FileDataSourceSvc {
 			// credentials
 			Map<String, String> decryptionMap = new HashMap<>();
 
-			decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 			
 			log.info("getConnection, using credetials, initializing file http connection");
 		    return getURLConnection(dbDataSource.getFileDetails().getFileURL(),  decryptionMap.get("dbServerUsername".toLowerCase()),  decryptionMap.get("dbServerPassword".toLowerCase()));
@@ -268,8 +276,8 @@ public class FileDataSourceSvcImpl implements FileDataSourceSvc {
 		String line;
 		StringBuilder resultString = new StringBuilder();
 		int rows=0, rowsLimit; 
-		String strRowsLimit = HelperTool.getEnv("datasource_sample_size",
-				HelperTool.getComponentPropertyValue("datasource_sample_size"));
+		String strRowsLimit = helperTool.getEnv("datasource_sample_size",
+				helperTool.getComponentPropertyValue("datasource_sample_size"));
 		rowsLimit = strRowsLimit != null ? Integer.parseInt(strRowsLimit) : 5;
 		
 		while ((line = br.readLine()) != null && rows++<rowsLimit) {

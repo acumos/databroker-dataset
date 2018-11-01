@@ -33,19 +33,6 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.security.UserGroupInformation;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import org.acumos.datasource.common.CmlpApplicationEnum;
 import org.acumos.datasource.common.DataSrcErrorList;
 import org.acumos.datasource.common.DataSrcRestError;
@@ -55,10 +42,21 @@ import org.acumos.datasource.common.KerberosConfigInfo;
 import org.acumos.datasource.connection.DbUtilitiesV2;
 import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.model.KerberosLogin;
-import org.acumos.datasource.schema.DataSourceModelGet;
 import org.acumos.datasource.schema.DataSourceMetadata;
+import org.acumos.datasource.schema.DataSourceModelGet;
 import org.acumos.datasource.schema.NameValue;
 import org.acumos.datasource.utils.ApplicationUtilities;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
@@ -70,6 +68,12 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 
 	@Autowired
 	private DbUtilitiesV2 dbUtilities;
+	
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
 
 	@Override
 	public Configuration createConnWithoutKerberos(String hostName) throws DataSrcException, IOException {
@@ -89,7 +93,7 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 								objKerberosLogin.getKerberosLoginUser().indexOf("@"))
 						+ "." + "kerberos.keytab").exists())) {
 			log.info("Kerberos keytab doesn't exist, creating a new one");
-			ApplicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
+			applicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
 		}
 		log.info("Creating a hadoop configuration with kerberos for " + hostName);
 		String result = getConnStatusWithKerberos(hostName, objKerberosLogin.getKerberosLoginUser(), null,readWriteDescriptor);
@@ -115,7 +119,7 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 	@Override
 	public void createKerberosKeytab(KerberosLogin objKerberosLogin) throws IOException, DataSrcException {
 		log.info("Creating kerberos keytab for principal " + objKerberosLogin.getKerberosLoginUser());
-		ApplicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
+		applicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
 		log.info("Created kerberos keytab for principal " + objKerberosLogin.getKerberosLoginUser());
 	}
 	
@@ -130,7 +134,7 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 		
 		try {
 			log.info("Starting to establish a test connection to " + hostName + " for hdfs connectivity.");
-			Configuration config = HelperTool.getKerberisedConfiguration(hostName,
+			Configuration config = helperTool.getKerberisedConfiguration(hostName,
 					kerberosLoginuser);
 			
 			log.info("Initializing filesystem with kerberised settings for " + hostName + " for hdfs connectivity.");
@@ -212,12 +216,12 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 			log.info("Creating kerberos keytab for hostname " + hostName + " using principal "
 					+ objKerberosLogin.getKerberosLoginUser() + " for hdfs connectivity testing.");
 
-			ApplicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());	
+			applicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());	
 		} else {
 			try {
 				log.info("overwriting kerberos keytab for hostname " + hostName + " using principal "
 						+ objKerberosLogin.getKerberosLoginUser() + " for hdfs connectivity testing.");
-				ApplicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
+				applicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
 			} catch (Exception e) {
 				//ignore
 				log.info("Exception occurred while creating kereberos keytab" + e.getMessage());
@@ -238,13 +242,13 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 		ArrayList<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false, authorization);
 		//JSONObject objJson = new JSONObject(cassandraDetails.get(0));
 		
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		
 		if (dbDataSource.getCategory().equals("hdfs") && dbDataSource.getOwnedBy().equals(user)) {
 
 			Map<String, String> decryptionMap = new HashMap<>();
 			//decryptionMap = Utilities.readFromCodeCloud(authorization, datasourceKey);
-			decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 			
 			//if dataReferenceBox is checked, return config file/keytab file contents
 			//EE-2557
@@ -259,10 +263,10 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 
 			log.info("Starting to establish a test connection to " + dbDataSource.getCommonDetails().getServerName()
 					+ " for hdfs connectivity.");
-			/*Configuration config = HelperTool.getKerberisedConfiguration(
+			/*Configuration config = helperTool.getKerberisedConfiguration(
 					objJson.getString("serverName"), decrptionMap.get("kerberosLoginUser".toLowerCase()));*/
 			
-			Configuration config = HelperTool.getKerberisedConfiguration(
+			Configuration config = helperTool.getKerberisedConfiguration(
 					dbDataSource.getCommonDetails().getServerName(), decryptionMap.get("kerberosLoginUser".toLowerCase()));
 			
 			log.info("Initializing filesystem with kerberised settings for " + dbDataSource.getCommonDetails().getServerName()
@@ -290,7 +294,7 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 							+ " succeeded for establishing hdfs connectivity on "
 							+ dbDataSource.getCommonDetails().getServerName());
 							//return in.getWrappedStream();
-							return ApplicationUtilities.getInputStream(in);
+							return applicationUtilities.getInputStream(in);
 					}
 				}
 
@@ -328,7 +332,7 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 		objJson.remove("_id");
 		
 		//Add the fields from code cloud
-		objJson.put("kerberosconfigfilecontents", ApplicationUtilities.htmlDecoding(decryptionMap.get("kerberosconfigfilecontents")));
+		objJson.put("kerberosconfigfilecontents", applicationUtilities.htmlDecoding(decryptionMap.get("kerberosconfigfilecontents")));
 		objJson.put("kerberoskeytabcontent", decryptionMap.get("kerberoskeytabcontent"));
 		objJson.put("kerberosloginuser", decryptionMap.get("kerberosloginuser"));
 		
@@ -342,12 +346,12 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 
 		ArrayList<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false, authorization);
 		
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		
 		if (dbDataSource.getCategory().equals("hdfs") && dbDataSource.getOwnedBy().equals(user)) {
 			Map<String, String> decryptionMap = new HashMap<>();
 			//decryptionMap = Utilities.readFromCodeCloud(authorization, datasourceKey);
-			decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 			
 			//Restore Kerberos Cache config files if they missed due to POD bounce
 			restoreKerberosCacheConfigFiles(decryptionMap);
@@ -357,7 +361,7 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 			
 			log.info("Starting to establish a test connection to " + dbDataSource.getCommonDetails().getServerName()
 					+ " for hdfs connectivity.");
-			Configuration config = HelperTool.getKerberisedConfiguration(
+			Configuration config = helperTool.getKerberisedConfiguration(
 					dbDataSource.getCommonDetails().getServerName(), decryptionMap.get("kerberosLoginUser".toLowerCase()));	
 				//	kerberosConfigFileName, kerberosKeyTabFileName);
 			
@@ -390,8 +394,8 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 					log.info("Reading of " + dbDataSource.getHdfsHiveDetails().getHdfsFoldername()
 							+ " succeeded for establishing hdfs connectivity on "
 							+ dbDataSource.getCommonDetails().getServerName());
-					int limit = Integer.parseInt(HelperTool.getEnv("datasource_sample_size",
-							HelperTool.getComponentPropertyValue("datasource_sample_size"))) * 100;
+					int limit = Integer.parseInt(helperTool.getEnv("datasource_sample_size",
+							helperTool.getComponentPropertyValue("datasource_sample_size"))) * 100;
 					byte[] buffer = new byte[limit];
 					int bytesRead = in.read(0l, buffer, 0, limit);
 					in.close();
@@ -432,7 +436,7 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 		}*/
 		log.info("Creating a hadoop configuration with kerberos for " + hostName);
 		log.info("Starting to establish a test connection to " + hostName + " for hdfs connectivity.");
-		Configuration config = HelperTool.getKerberisedConfiguration(hostName,
+		Configuration config = helperTool.getKerberisedConfiguration(hostName,
 				objKerberosLogin.getKerberosLoginUser());
 		log.info("Initializing filesystem with kerberised settings for " + hostName + " for hdfs connectivity.");
 		FileSystem fs = FileSystem.get(config);
@@ -454,19 +458,19 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 		StringBuilder sb2 = new StringBuilder();
 		sb2.append(krbLoginUser.substring(0, krbLoginUser.indexOf("@"))).append(".kerberos.keytab");
 		
-		if(!ApplicationUtilities.isUserKerberosCacheConfigFilesExists(sb1.toString(), sb2.toString())) {
+		if(!applicationUtilities.isUserKerberosCacheConfigFilesExists(sb1.toString(), sb2.toString())) {
 			//Restore Kerberos Cache files if they are missed due to POD bounce
 			log.info("restoreKerberosCacheConfigFiles(), restoring config files from codecloud...");
 			
-			boolean isWritten = ApplicationUtilities.writeToKerberosCacheFile(sb1.toString(), decryptionMap.get("KerberosConfigFileContents".toLowerCase()));
+			boolean isWritten = applicationUtilities.writeToKerberosCacheFile(sb1.toString(), decryptionMap.get("KerberosConfigFileContents".toLowerCase()));
 			
 			if(isWritten) {
-				isWritten = ApplicationUtilities.writeToKerberosCacheFile(sb2.toString(), decryptionMap.get("KerberosKeyTabContent".toLowerCase()));
+				isWritten = applicationUtilities.writeToKerberosCacheFile(sb2.toString(), decryptionMap.get("KerberosKeyTabContent".toLowerCase()));
 			}
 			
 			if(!isWritten) {
 				//1. delete config files, if any
-				ApplicationUtilities.deleteUserKerberosCacheConfigFiles(sb1.toString(), sb2.toString());
+				applicationUtilities.deleteUserKerberosCacheConfigFiles(sb1.toString(), sb2.toString());
 				
 				//2. throw Exception
 				DataSrcRestError err = DataSrcErrorList.buildError(new Exception("Unable to retrieve connection parameters from the codecloud."), null, CmlpApplicationEnum.DATASOURCE);
@@ -480,12 +484,12 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 	public InputStream getSampleResults(DataSourceModelGet dataSource) throws DataSrcException, IOException {
 		log.info("Starting to establish a test connection to " + dataSource.getCommonDetails().getServerName()
 		+ " for hdfs connectivity.");
-		ApplicationUtilities.validateConnectionParameters(dataSource);
+		applicationUtilities.validateConnectionParameters(dataSource);
 		
 		String kerberosConfigFileName = dataSource.getHdfsHiveDetails().getKerberosConfigFileId();
 		String kerberosKeyTabFileName = dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId();
 
-		KerberosConfigInfo kerberosConfig = ApplicationUtilities.getKerberosConfigInfo(kerberosConfigFileName, kerberosKeyTabFileName);
+		KerberosConfigInfo kerberosConfig = applicationUtilities.getKerberosConfigInfo(kerberosConfigFileName, kerberosKeyTabFileName);
 
 		log.info("getSampleResults, Received following Kerberos config info from ConfigFile : "
 				+ dataSource.getHdfsHiveDetails().getKerberosConfigFileId());
@@ -512,12 +516,12 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 		log.info("Creating kerberos keytab for hostname " + dataSource.getCommonDetails().getServerName() + " using principal "
 				+ objKerberosLogin.getKerberosLoginUser() + " for hdfs connectivity testing.");
 
-		ApplicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());	
+		applicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());	
 	} else {
 		try {
 			log.info("overwriting kerberos keytab for hostname " + dataSource.getCommonDetails().getServerName() + " using principal "
 					+ objKerberosLogin.getKerberosLoginUser() + " for hdfs connectivity testing.");
-			ApplicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
+			applicationUtilities.createKerberosKeytab(objKerberosLogin, objKerberosLogin.getKerberosKeyTabFileName(), objKerberosLogin.getKerberosConfigFileName());
 		} catch (Exception e) {
 			//ignore
 			log.info("Issue while creating kerberosKeyTab: " + e.getMessage());
@@ -525,7 +529,7 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 	}
 		
 		
-		Configuration config = HelperTool.getKerberisedConfiguration(
+		Configuration config = helperTool.getKerberisedConfiguration(
 				dataSource.getCommonDetails().getServerName(), dataSource.getHdfsHiveDetails().getKerberosLoginUser());
 
 		log.info("Initializing filesystem with kerberised settings for " + dataSource.getCommonDetails().getServerName()
@@ -540,8 +544,8 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 		if (in.available() > 0) {
 			log.info("Reading of " + dataSource.getHdfsHiveDetails().getHdfsFoldername()
 			+ " succeeded for establishing hdfs connectivity on " + dataSource.getCommonDetails().getServerName());
-			int limit = Integer.parseInt(HelperTool.getEnv("datasource_sample_size",
-					HelperTool.getComponentPropertyValue("datasource_sample_size"))) * 100;
+			int limit = Integer.parseInt(helperTool.getEnv("datasource_sample_size",
+					helperTool.getComponentPropertyValue("datasource_sample_size"))) * 100;
 			buffer = new byte[limit];
 			@SuppressWarnings("unused")
 			int bytesRead = in.read(0l, buffer, 0, limit);
@@ -549,20 +553,19 @@ public class HdpDataSourceSvcImpl implements HdpDataSourceSvc {
 			// return in.getWrappedStream();s
 		} 
 		
-		ApplicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
+		applicationUtilities.deleteUserKerberosConfigFiles(dataSource.getHdfsHiveDetails().getKerberosConfigFileId(),
 				dataSource.getHdfsHiveDetails().getKerberosKeyTabFileId());
 		return (new ByteArrayInputStream(buffer));
 	}
 	@Override
 	public boolean writebackPrediction(String user, String authorization, DataSourceModelGet dataSource, String data,String hdfsFilename) throws IOException, DataSrcException {
-		log.info("writebackPrediction :  starting");
 
 		boolean status = false;
 		Map<String, String> decryptionMap = new HashMap<>();
 		//decryptionMap = Utilities.readFromCodeCloud(authorization, dataSource.getDatasourceKey());
-		decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, dataSource.getDatasourceKey());
+		decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, dataSource.getDatasourceKey());
 		
-		Configuration config = HelperTool.getKerberisedConfiguration(
+		Configuration config = helperTool.getKerberisedConfiguration(
 				dataSource.getCommonDetails().getServerName(),
 				decryptionMap.get("kerberosLoginUser".toLowerCase()));
 

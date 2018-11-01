@@ -109,7 +109,7 @@ public class FilterResults {
 			sb.append(links[j].toString());
 		}
 
-		response.getHeaders().add("Link", sb.toString());
+		response.getHeaders().add("link", sb.toString());
 
 		return response;
 	}

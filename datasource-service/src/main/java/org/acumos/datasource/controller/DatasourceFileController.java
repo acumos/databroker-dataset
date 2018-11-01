@@ -76,6 +76,9 @@ public class DatasourceFileController {
 	@Autowired
 	private HttpServletRequest request;
 	
+	@Autowired
+	HelperTool helperTool;
+	
 	@RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = LOG_UPLOADING_KERBEROS_CONFIG_FILES, notes = LOG_STATUS_OF_UPLOADING_FILES, response = FileDetailsInfo.class)
 	@ApiResponses(value = {
@@ -91,7 +94,7 @@ public class DatasourceFileController {
 			@RequestParam(KEYTABFILE) MultipartFile bodyPart2) {
 		
 		try {
-			String remoteUser = HelperTool.getRemoteUser(request);
+			String remoteUser = helperTool.getRemoteUser(request);
 			log.info("kerberosFileupload, remote user detail: " + remoteUser);
 			
 			if(bodyPart1 == null || bodyPart1 == null) {

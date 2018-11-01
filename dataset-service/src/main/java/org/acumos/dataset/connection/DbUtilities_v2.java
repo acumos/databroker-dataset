@@ -140,6 +140,12 @@ public class DbUtilities_v2 {
 	
 	@Autowired
 	private Environment env;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
+	
+	@Autowired
+	DataSetSearchBuilder dataSetSearchBuilder;
 
 	
 	private DBCollection getMongoCollection() throws IOException {
@@ -165,7 +171,7 @@ public class DbUtilities_v2 {
 
 	
 	public void insertDataSetDetails(DatasetModelGet dataSet) throws IOException {
-		DBObject dbObj = DataSetSearchBuilder.createDBObject(dataSet);
+		DBObject dbObj = dataSetSearchBuilder.createDBObject(dataSet);
 		WriteResult result = getMongoCollection().insert(dbObj);
 		log.info(ID_OF_THE_INSERTED_MONGO_OBJECT + result.getUpsertedId());
 	}
@@ -176,7 +182,7 @@ public class DbUtilities_v2 {
 		
 		ArrayList<String> results = new ArrayList<String>();
 		
-		BasicDBObjectBuilder query = DataSetSearchBuilder.buildQueryForGet(user, datasetKey, mode);
+		BasicDBObjectBuilder query = dataSetSearchBuilder.buildQueryForGet(user, datasetKey, mode);
 		DBObject dbObj = query.get();
 				
 		log.info(GET_DATA_SET_DETAILS_RUNNING_QUERY + dbObj.toString());
@@ -237,7 +243,7 @@ public class DbUtilities_v2 {
 		
 		log.info(UPDATE_DATA_SET_ISSUING_COMMAND_TO_UPDATE_OBJECT_WITH_ID + dataset.getDatasetKey());
 		
-		DBObject dbObj = DataSetSearchBuilder.updateDBObject(dataset);
+		DBObject dbObj = dataSetSearchBuilder.updateDBObject(dataset);
 		
 		log.info(GET_DATA_SET_DETAILS_RUNNING_QUERY + dbObj.toString());
 		
@@ -283,11 +289,11 @@ public class DbUtilities_v2 {
 		
 		log.info(UPDATE_DATA_SET_ISSUING_COMMAND_TO_UPDATE_OBJECT_WITH_ID + datasetKey);
 		
-		DBObject dbObj = DataSetSearchBuilder.deleteDBObject(datasetKey);
+		DBObject dbObj = dataSetSearchBuilder.deleteDBObject(datasetKey);
 		
 		log.info(GET_DATA_SET_DETAILS_RUNNING_QUERY + dbObj.toString());
 		
-		if(ApplicationUtilities.isHardDeleteTurnedOn()) {
+		if(applicationUtilities.isHardDeleteTurnedOn()) {
 			result = getMongoCollection().remove(query.get());
 			if(result.getN() > 0)
 				deleteDataset = true;
@@ -383,7 +389,7 @@ public class DbUtilities_v2 {
 		
 		ArrayList<String> results = new ArrayList<>();
 		
-		BasicDBObjectBuilder query = DataSetSearchBuilder.buildQueryForAdvancedSearch(user, datasetKey, dataSearchKeys);
+		BasicDBObjectBuilder query = dataSetSearchBuilder.buildQueryForAdvancedSearch(user, datasetKey, dataSearchKeys);
 		DBObject dbObj = query.get();
 				
 		log.info(GET_DATA_SET_DETAILS_RUNNING_ADVANCED_QUERY + dbObj.toString());
@@ -403,7 +409,7 @@ public class DbUtilities_v2 {
 	public boolean checkForDatasetDatasource(String user, String datasetKey, String datasourceKey) throws IOException, DataSetException {
 		boolean result = false;
 		
-		BasicDBObjectBuilder query = DataSetSearchBuilder.checkForDatasetDatasource(user, datasetKey, datasourceKey);
+		BasicDBObjectBuilder query = dataSetSearchBuilder.checkForDatasetDatasource(user, datasetKey, datasourceKey);
 		DBObject dbObj = query.get();
 				
 		log.info(CHECK_FOR_DATASET_DATASOURCE_RUNNING_QUERY + dbObj.toString());
@@ -434,7 +440,7 @@ public class DbUtilities_v2 {
 		
 		log.info(UPDATE_ATTRIBUTE_META_DATA_ISSUING_COMMAND_TO_UPDATE_OBJECT_WITH_ID + datasetKey);
 		
-		DBObject dbObj = DataSetSearchBuilder.updateAttributeMetaData(null, attributeMetaData);
+		DBObject dbObj = dataSetSearchBuilder.updateAttributeMetaData(null, attributeMetaData);
 		
 		log.info(UPDATE_ATTRIBUTE_META_DATA_RUNNING_QUERY + dbObj.toString());
 		
@@ -461,7 +467,7 @@ public class DbUtilities_v2 {
 		
 		log.info(UPDATE_DATA_SOURCE_KEY_ISSUING_COMMAND_TO_UPDATE_OBJECT_WITH_ID + datasetKey);
 		
-		DBObject dbObj = DataSetSearchBuilder.updateAttributeMetaData(datasourceKey, attributeMetaData);
+		DBObject dbObj = dataSetSearchBuilder.updateAttributeMetaData(datasourceKey, attributeMetaData);
 		
 		log.info(UPDATE_DATA_SOURCE_KEY_RUNNING_QUERY + dbObj.toString());
 		

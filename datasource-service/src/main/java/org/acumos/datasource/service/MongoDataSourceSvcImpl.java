@@ -32,26 +32,32 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.acumos.datasource.schema.DataSourceModelGet;
-import org.acumos.datasource.schema.DataSourceMetadata;
-import org.acumos.datasource.schema.NameValue;
-import org.acumos.datasource.utils.ApplicationUtilities;
-
-import com.mongodb.*;
-import org.bson.BasicBSONEncoder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import org.slf4j.LoggerFactory;
 import org.acumos.datasource.common.CmlpApplicationEnum;
 import org.acumos.datasource.common.DataSrcErrorList;
 import org.acumos.datasource.common.DataSrcRestError;
 import org.acumos.datasource.common.ErrorListEnum;
+import org.acumos.datasource.common.HelperTool;
 import org.acumos.datasource.connection.DbUtilitiesV2;
 import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.model.MongoDbConnectionModel;
+import org.acumos.datasource.schema.DataSourceMetadata;
+import org.acumos.datasource.schema.DataSourceModelGet;
+import org.acumos.datasource.schema.NameValue;
+import org.acumos.datasource.utils.ApplicationUtilities;
+import org.bson.BasicBSONEncoder;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import com.mongodb.util.JSON;
 
 @Service
@@ -64,6 +70,12 @@ public class MongoDataSourceSvcImpl implements MongoDataSourceSvc {
 
 	@Autowired
 	private DbUtilitiesV2 dbUtilities;
+	
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
 
 	@Override
 	public String getConnectionStatus_2_10(MongoDbConnectionModel objMongoDbConnectionModel, String query)
@@ -166,7 +178,7 @@ public class MongoDataSourceSvcImpl implements MongoDataSourceSvc {
 
 		ArrayList<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false, authorization);
 		
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		
 		if (dbDataSource.getCategory().equals("mongo") && dbDataSource.getOwnedBy().equals(user)) {
 			MongoClient mongo = null;
@@ -177,7 +189,7 @@ public class MongoDataSourceSvcImpl implements MongoDataSourceSvc {
 			StringBuilder builderObject = new StringBuilder();
 			Map<String, String> decryptionMap = new HashMap<>();
 
-			decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 
 			// initializing and populating MongoDbConnectionModel
 			MongoDbConnectionModel objMongoDbConnectionModel = new MongoDbConnectionModel();
@@ -259,7 +271,7 @@ public class MongoDataSourceSvcImpl implements MongoDataSourceSvc {
 				getDataSourceDetails(user, null, null,
 						datasourceKey, null, true, false, authorization);
 
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		
 		log.info("getSampleResults, category test and user checking for mongo datasource will be initiated");
 		if (dbDataSource.getCategory().equals("mongo") &&
@@ -272,7 +284,7 @@ public class MongoDataSourceSvcImpl implements MongoDataSourceSvc {
 			StringBuilder builderObject = new StringBuilder();
 			Map<String, String> decryptionMap = new HashMap<>();
 
-			decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 
 			// initializing and populating MongoDbConnectionModel
 			MongoDbConnectionModel objMongoDbConnectionModel = new MongoDbConnectionModel();
@@ -326,7 +338,7 @@ public class MongoDataSourceSvcImpl implements MongoDataSourceSvc {
 	@Override
 	public InputStream getSampleResults(DataSourceModelGet dataSource) throws UnknownHostException, IOException, NumberFormatException, DataSrcException {
 		log.info("getSampleResultsBeforeRegistration, checking null condition");
-		ApplicationUtilities.validateConnectionParameters(dataSource);
+		applicationUtilities.validateConnectionParameters(dataSource);
 		
 		// initializing 
 		StringBuilder builderObject = new StringBuilder();

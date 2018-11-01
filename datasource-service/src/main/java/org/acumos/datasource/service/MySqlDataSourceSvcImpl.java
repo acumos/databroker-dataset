@@ -36,10 +36,6 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import org.slf4j.LoggerFactory;
 import org.acumos.datasource.common.CmlpApplicationEnum;
 import org.acumos.datasource.common.DataSrcErrorList;
 import org.acumos.datasource.common.DataSrcRestError;
@@ -49,11 +45,14 @@ import org.acumos.datasource.connection.DbUtilitiesV2;
 import org.acumos.datasource.exception.DataSrcException;
 import org.acumos.datasource.model.MysqlConnectorModel;
 import org.acumos.datasource.schema.ColumnMetadataInfo;
-import org.acumos.datasource.schema.DataSourceModelGet;
 import org.acumos.datasource.schema.DataSourceMetadata;
+import org.acumos.datasource.schema.DataSourceModelGet;
 import org.acumos.datasource.schema.NameValue;
 import org.acumos.datasource.utils.ApplicationUtilities;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MySqlDataSourceSvcImpl implements MySqlDataSourceSvc {
@@ -65,6 +64,12 @@ public class MySqlDataSourceSvcImpl implements MySqlDataSourceSvc {
 
 	@Autowired
 	private DbUtilitiesV2 dbUtilities;
+	
+	@Autowired
+	HelperTool helperTool;
+	
+	@Autowired
+	ApplicationUtilities applicationUtilities;
 
 	@Override
 	public String getConnectionStatus(MysqlConnectorModel objMysqlConnectorModel, String query)
@@ -110,7 +115,7 @@ public class MySqlDataSourceSvcImpl implements MySqlDataSourceSvc {
 			throws ClassNotFoundException, IOException, SQLException, DataSrcException {
 		// registering driver
 		Class.forName(
-				HelperTool.getEnv("mysql_driver_name", HelperTool.getComponentPropertyValue("mysql_driver_name")));
+				helperTool.getEnv("mysql_driver_name", helperTool.getComponentPropertyValue("mysql_driver_name")));
 		Connection connection = null;
 
 		// preparing URL
@@ -126,12 +131,12 @@ public class MySqlDataSourceSvcImpl implements MySqlDataSourceSvc {
 		
 		ArrayList<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false,authorization);
 		
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		
 		if (dbDataSource.getCategory().equals("mysql") && dbDataSource.getOwnedBy().equals(user)) {
 			Map<String, String> decryptionMap = new HashMap<>();
 
-			decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 			
 			StringBuilder resultString = null;
 			
@@ -209,8 +214,8 @@ public class MySqlDataSourceSvcImpl implements MySqlDataSourceSvc {
 			throws DataSrcException, IOException, SQLException, ClassNotFoundException {
 		
 		int rowsLimit; //default to 5
-		String strRowsLimit = HelperTool.getEnv("datasource_sample_size",
-				HelperTool.getComponentPropertyValue("datasource_sample_size"));
+		String strRowsLimit = helperTool.getEnv("datasource_sample_size",
+				helperTool.getComponentPropertyValue("datasource_sample_size"));
 		rowsLimit = strRowsLimit != null ? Integer.parseInt(strRowsLimit) : 5;
 
 		return (getResults( user, authorization, namespace, datasourceKey, rowsLimit));
@@ -223,12 +228,12 @@ public class MySqlDataSourceSvcImpl implements MySqlDataSourceSvc {
 
 		ArrayList<String> dbDatasourceDetails = dbUtilities.getDataSourceDetails(user, null, null, datasourceKey, null, true, false, authorization);
 		
-		DataSourceModelGet dbDataSource = ApplicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
+		DataSourceModelGet dbDataSource = applicationUtilities.getDataSourceModel(dbDatasourceDetails.get(0));
 		
 		if (dbDataSource.getCategory().equals("mysql") && dbDataSource.getOwnedBy().equals(user)) {
 			Map<String, String> decryptionMap = new HashMap<>();
 			
-			decryptionMap = ApplicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
+			decryptionMap = applicationUtilities.readFromMongoCodeCloud(user, datasourceKey);
 			
 			StringBuilder resultString = null;
 			
@@ -342,8 +347,8 @@ public class MySqlDataSourceSvcImpl implements MySqlDataSourceSvc {
 	public long getMySqlDatasetSize(ResultSet results) throws SQLException, IOException, DataSrcException {
 		log.info("getMySqlDatasetSize()");
 		int MIN_SAMPLING_SIZE; //default to 50
-		String strMIN_SAMPLING_SIZE = HelperTool.getEnv("minimum_sampling_size",
-				HelperTool.getComponentPropertyValue("minimum_sampling_size"));
+		String strMIN_SAMPLING_SIZE = helperTool.getEnv("minimum_sampling_size",
+				helperTool.getComponentPropertyValue("minimum_sampling_size"));
 		MIN_SAMPLING_SIZE = strMIN_SAMPLING_SIZE != null ? Integer.parseInt(strMIN_SAMPLING_SIZE) : 50;
 
 		long size = 0;
@@ -367,19 +372,19 @@ public class MySqlDataSourceSvcImpl implements MySqlDataSourceSvc {
 		
 		if(dataSource.getDbDetails() != null) {
 			if(dataSource.getDbDetails().getDbQuery() == null || dataSource.getDbDetails().getDbQuery().isEmpty()) {
-				String defaultQuery = HelperTool.getEnv("test_mysql_query",
-						HelperTool.getComponentPropertyValue("test_mysql_query"));
+				String defaultQuery = helperTool.getEnv("test_mysql_query",
+						helperTool.getComponentPropertyValue("test_mysql_query"));
 				dataSource.getDbDetails().setDbQuery(defaultQuery);
 			}
 			
 		}
 		
 		//check for required connection parameters
-		ApplicationUtilities.validateConnectionParameters(dataSource);
+		applicationUtilities.validateConnectionParameters(dataSource);
 		
 		int rowsLimit; //default to 5
-		String strRowsLimit = HelperTool.getEnv("datasource_sample_size",
-				HelperTool.getComponentPropertyValue("datasource_sample_size"));
+		String strRowsLimit = helperTool.getEnv("datasource_sample_size",
+				helperTool.getComponentPropertyValue("datasource_sample_size"));
 		rowsLimit = strRowsLimit != null ? Integer.parseInt(strRowsLimit) : 5;
 		
 		//creating connection
